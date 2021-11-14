@@ -1,0 +1,46 @@
+baseURL: http://www.ellemouton.com
+languageCode: en-us
+title: Elle Mouton 
+theme: "PaperMod"
+
+menu:
+  main:
+      - name: Archive
+        url: archives
+        weight: 5
+      - name: Search
+        url: search/
+        weight: 10
+
+# Needed for seach functionality
+outputs:
+ home:
+     - HTML
+     - RSS
+     - JSON
+
+params:
+  defaultTheme: light # auto, dark
+  ShowShareButtons: true
+  
+  homeInfoParams:
+        Title: "Mah Brain Nonsense"
+        Content: Welcome! Here be Bitcoin & Lightning related things. 
+
+  socialIcons:
+      - name: github
+        url: "https://github.com/ellemouton"
+      - name: twitter
+        url: "https://twitter.com/ellemouton"
+      - name: keybase
+        url: "https://keybase.io/ellemo"
+      - name: instagram
+        url: "https://www.instagram.com/ellemouton"
+      - name: linkedin
+        url: "https://www.linkedin.com/in/elle-mouton-50635a143/"
+      - name: email
+        url: "mailto://elle@lightning.engineering"
+
+  buttons:
+      - name: Archives
+        url: archives
