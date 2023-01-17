@@ -149,7 +149,7 @@ Alice can now also further fill in her own commitment transaction:
 `bob_payment_key_1`, `bob_to_self_delay` and `revoke_pubkey_1a`
 - since the TXID for the funding tx is now known, she can complete the input too.
 
-She know knows everything she needs to know in order to sign this transaction
+She now knows everything she needs to know in order to sign this transaction
 herself _but_ she is still missing Bob’s signature for this transaction. 
 
  ![](/openChanPt1/1a_3.png#center)
@@ -184,7 +184,7 @@ from Bob for her commitment transaction. Enter `funding_signed`:
 Notice that this is the first message to use the real channel ID instead of the
 temporary one. 
 
-This was the last piece of the puzzle for Alice, She now has all the info she
+This was the last piece of the puzzle for Alice. She now has all the info she
 needs to be able to sign her commitment transaction if ever needed. 
 
  ![](/openChanPt1/a1_4.png#center)
@@ -209,8 +209,8 @@ this channel to the network!
 
 This part is fairly painless. Basically there is just one message,
 `channel_announcement`, that Alice and Bob need to construct together and once
-it is complete, then can broadcast it to the network. Other nodes will use this
-message to prove a few things:
+it is complete, then they can broadcast it to the network. Other nodes will use
+this message to prove a few things:
 
 - That the channel funding tx is actually an existing, unspent UTXO with an
 acceptable number of confirmations. 
@@ -240,7 +240,7 @@ Let’s go over the steps that a node (Charlie) receiving this message will go
 through in order to verify the new channel that Alice and Bob claimed to have
 opened. 
 
-1. First, Charlie will use the `short_channel_id` included in the message make sure
+1. First, Charlie will use the `short_channel_id` included in the message to make sure
 that the channel’s funding transaction actually exists on-chain, that it has a
 sufficient number of confirmations and that it is in fact unspent. 
 2. Then, Charlie will also check that the unspent output actually does look like a
