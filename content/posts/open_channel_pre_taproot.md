@@ -44,8 +44,8 @@ respective commitment transactions and once the funding transaction is on chain.
 Throughout this explanation, I will use diagrams and colours to illustrate the
 process. In the diagrams, a white background means that the field of the
 transaction is not yet known. A coloured-in field indicates that the field value
-is known. Any blue fields are used to highlight any of Alice’s public keys or
-signatures and any green fields are used to show Bob’s. 
+is known. Any green fields are used to highlight any of Alice’s public keys or
+signatures and any blue fields are used to show Bob’s. 
 
 There are three transactions in play for the opening of a transaction. The first
 is the funding transaction which will need to go on chain. The other two are the
