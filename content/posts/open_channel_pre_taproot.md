@@ -12,7 +12,7 @@ detail about it and all the messages involved in “opening” the channel endin
 with the `channel_announcement` message. 
 
 The point of this article is to recap the current channel open flow so that a
-follow article describing the opening of a taproot
+follow up article describing the opening of a taproot
 channel[^taproot-channel-proposal] can focus only on the changes that taproot
 channels bring to the process.
 
@@ -47,7 +47,7 @@ transaction is not yet known. A coloured-in field indicates that the field value
 is known. Any green fields are used to highlight any of Alice’s public keys or
 signatures and any blue fields are used to show Bob’s. 
 
-There are three transactions in play for the opening of a transaction. The first
+There are three transactions in play for the opening of a channel. The first
 is the funding transaction which will need to go on chain. The other two are the
 first commitment transactions held by Alice and Bob describing the initial state
 of the channel.
@@ -82,8 +82,9 @@ Let’s now fill in Alice’s values for these fields:
 Alice sends this message over to Bob. 
 
 Since Alice has decided on the type of channel she wants to open (default
-channel type) as well as the channel capacity, she can already piece together
-quite a large part of the funding transaction:
+channel type as opposed to an anchors, taproot etc) as well as the channel
+capacity, she can already piece together quite a large part of the funding
+transaction:
 
  ![](/openChanPt1/fntx_2.png#center)
 
@@ -145,7 +146,7 @@ everything is filled in, the TXID for the funding tx is now also known.
 
 Alice can now also further fill in her own commitment transaction:
 
-- she now able to use the values sent by Bob to fill in `bob_pubkey_1`,
+- she is now able to use the values sent by Bob to fill in `bob_pubkey_1`,
 `bob_payment_key_1`, `bob_to_self_delay` and `revoke_pubkey_1a`
 - since the TXID for the funding tx is now known, she can complete the input too.
 
@@ -216,7 +217,7 @@ this message to prove a few things:
 acceptable number of confirmations. 
 - That the funding transaction output actually looks like a lightning channel
 funding transaction
-- That the said channel is actually owned by the keys that Alice and Bob say they
+- That the channel is actually owned by the keys that Alice and Bob say they
 used to construct the channel.
 - That Alice and Bob both agree on the message being broadcast. 
 
