@@ -6,22 +6,21 @@ aliases:
   - /open_channel_pre_taproot
 ---
 
-In this article, I will go over the current process of opening a Lightning
-Network channel. I will start with the `channel_open` message and will talk in
-detail about it and all the messages involved in “opening” the channel ending
-with the `channel_announcement` message. 
+In this article, I will go over the process of opening a Lightning Network
+channel as it is used today. I will start by explaining the `open_channel`
+message as well as all the steps involved in “opening” the channel, up until the
+`channel_announcement`.
 
-The point of this article is to recap the current channel open flow so that a
-follow up article describing the opening of a taproot
-channel[^taproot-channel-proposal] can focus only on the changes that taproot
-channels bring to the process.
+My goal for this article is to recap today’s channel open flow so that we can
+later focus only on the changes required for opening a taproot
+channel[^taproot-channel-proposal].
 
 I previously wrote a [short article on channel opens] but I plan on revamping it
-here and diving into it in way more detail and with more diagrams (yay
-diagrams!). I will assume that the reader understands the structure of
-a commitment transaction and understands why they are asymmetric. If you feel
-you are a bit rusty in this area, please check out my articles explaining these
-[concepts in detail].
+This article replaces my previous [short article on channel opens]. It includes
+more detail and more diagrams (yay diagrams!). I will assume that the reader
+understands the structure of a commitment transaction and understands why they
+are asymmetric. If you feel a bit rusty in this area, please check out my
+articles explaining these [concepts in detail].
 
 ## The end goal
 
