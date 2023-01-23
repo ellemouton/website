@@ -1,9 +1,12 @@
 ---
 title: "Opening and announcing a pre-taproot LN channel"
 summary: "A deep dive into opening a pre-taproot Lightning Network channel"
-date: 2023-01-17
+date: 2023-01-23
 aliases:
   - /open_channel_pre_taproot
+
+cover:
+  image: "/openChanPt1/open-chan-cover.png"
 ---
 
 In this article, I will go over the process of opening a Lightning Network
