@@ -2,6 +2,7 @@ baseURL: https://www.ellemouton.com
 languageCode: en-us
 title: Elle Mouton 
 theme: "PaperMod"
+googleAnalytics: "G-PMLX8P6J9S"
 
 menu:
   main:
