@@ -4,7 +4,7 @@ summary: "A recap of the building blocks required for Taproot channels"
 date: 2023-04-14
 aliases:
 - /taproot_recap
-draft: true
+offTheRecord: true
 
 cover:
     image: "/taprootPrelims/cover.png"
