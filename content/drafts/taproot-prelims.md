@@ -9,7 +9,7 @@ cover:
     image: "/taprootPrelims/cover.png"
 ---
 
-In my last blog post, I promised a follow-up post on the workings of taproot 
+In my last blog post, I promised a follow-up post on the workings of Taproot 
 channels. However, when I started working on it, I realised that it might be a 
 good idea to first dedicate a post to recap the preliminaries that will be 
 required in order to understand the follow-up Taproot channel articles. So here
@@ -25,7 +25,7 @@ topics or giving you enough of an understanding of how Taproot outputs and
 MuSig2 work so that the follow-up articles are more easily digestible. There are
 better articles out there for you if you want to get into the nitty-gritty of 
 these topics and of course you can always go checkout the BIPs if you are brave:
-Schnorr signatures, taproot outputs, Tapscript, MuSig2. [TODO: liiiinks].
+Schnorr signatures, Taproot outputs, Tapscript, MuSig2. [TODO: liiiinks].
 
 Ok, enough chit-chat. Onto the good stuff!
 
@@ -49,15 +49,15 @@ signatures (also known as Schnorr signatures), then checkout the BIP itself.
 
 # Taproot Outputs
 
-A taproot output shows up in the `scriptPubKey` section of a transaction (just 
+A Taproot output shows up in the `scriptPubKey` section of a transaction (just 
 like all other outputs) and has the following form: 
 
 ![](/taprootPrelims/tr-output.png#center)
 
-The `OP_1` indicates that this is a SegWit Version 1 output (a.k.a. taproot 
+The `OP_1` indicates that this is a SegWit Version 1 output (a.k.a. Taproot 
 output) and what follows are 32 bytes that represent the output key (see 
 [BIP340 public keys](#a-quick-note-on-bip340-public-keys) above). I will often 
-use `Q` to refer to this key. To give the full picture, here is a taproot 
+use `Q` to refer to this key. To give the full picture, here is a Taproot 
 output in a transaction:
 
 ![](/taprootPrelims/tr-output-in-tx.png#center)
@@ -97,15 +97,15 @@ different.
 ## Script Paths
 
 Here is where the magic really happens. You can also have the option of 
-spending your taproot output via a script _and_ each output can have multiple 
+spending your Taproot output via a script _and_ each output can have multiple 
 scripts from which it can be spent. Another cool thing is that if you choose to 
-include script paths in your taproot output, you can still add a regular key 
+include script paths in your Taproot output, you can still add a regular key 
 path like before. Let’s say, for example, that you want to be able to spend your
 output at any time, but you also want add three script paths so that it can also
 be spent in other scenarios: perhaps after 30 days you want your partner to be 
 able to spend the output. That would be one script path. If you also have two 
 other script paths (perhaps one is a 2-of-3 multi-sig and the other requires a 
-pre-image reveal), then your taproot output would be constructed as follows:
+pre-image reveal), then your Taproot output would be constructed as follows:
 
 ![](/taprootPrelims/tr-whole-thing.png#center)
 
@@ -120,7 +120,7 @@ the generator point, `G`, to get `T` which is then added to our internal key,
 such as the details of the script encodings and also how the scripts are hashed 
 in the Merkle tree so checkout the relevant BIPs if you are interested.
 
-Alrighty - our fancy taproot output has been setup! But now… how do we spend it?
+Alrighty - our fancy Taproot output has been setup! But now… how do we spend it?
 There are two ways of spending this transaction: the first is via the internal 
 key, `P`. We call this a _key path spend_. The other way is via one of the 
 scripts in the tree. This type of spend is called a _script path spend_.
@@ -189,7 +189,7 @@ can be found in [BIP86](link).
 
 # MuSig2
 
-With the taproot softfork, bitcoin nodes now have an understanding of BIP340 
+With the Taproot softfork, bitcoin nodes now have an understanding of BIP340 
 signatures (or Schnorr signatures). The beauty of these signatures is their 
 linearity: the owner of public key `P_1` can create a partial signature, 
 `sig_1` for the message `msg` and the owner of public key `P_2` can create 
@@ -212,7 +212,7 @@ trust-less and to protect parties from attacks such as key cancellation.
 BIP<???> defines the MuSig2 protocol along with a bunch of algorithms that 
 should be used for the various steps of the process. Since the aim of this 
 article is to provide all the building blocks required for understanding 
-Lightning taproot channels, I will only talk about MuSig2 at an API level using 
+Lightning Taproot channels, I will only talk about MuSig2 at an API level using 
 the defined algorithms and will focus more on how it will be used in Lightning. 
 If you would like to dig into it more you can checkout the BIP itself. I have 
 also implemented all the MuSig2 methods from scratch [here](schnorr repo link) 
@@ -281,7 +281,7 @@ message, `msg`.
 ![](/taprootPrelims/musig-6.png#center)
 
 It is important to become familiar with the above MuSig2 flow because it will be
-used very often in the next few articles. In taproot channels the funding output 
+used very often in the next few articles. In Taproot channels the funding output 
 of a channel will be a MuSig2 aggregate public key. This means that every 
 commitment transaction created that spends from the funding output will need to 
 go through this signing flow. Since channel states in Lightning are asymmetric, 
