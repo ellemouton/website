@@ -1,7 +1,7 @@
 ---
 title: "Taproot and MuSig2 recap"
 summary: "A recap of the building blocks required for Taproot channels"
-date: 2023-04-14
+date: 2023-04-15
 aliases:
 - /taproot_recap
 
@@ -9,11 +9,11 @@ cover:
     image: "/taprootPrelims/cover.png"
 ---
 
-In my last blog post, I promised a follow-up post on the workings of Taproot 
-channels. However, when I started working on it, I realised that it might be a 
-good idea to first dedicate a post to recap the preliminaries that will be 
-required in order to understand the follow-up Taproot channel articles. So here
-you go!
+In my [last][pre-tap-chans] blog post, I promised a follow-up post on the 
+workings of Taproot channels. However, when I started working on it, I realised 
+that it might be a good idea to first dedicate a post to recap the preliminaries
+that will be required in order to understand the follow-up Taproot channel 
+articles. So here you go!
 
 # Overview
 
@@ -25,7 +25,8 @@ topics or giving you enough of an understanding of how Taproot outputs and
 MuSig2 work so that the follow-up articles are more easily digestible. There are
 better articles out there for you if you want to get into the nitty-gritty of 
 these topics and of course you can always go checkout the BIPs if you are brave:
-Schnorr signatures, Taproot outputs, Tapscript, MuSig2. [TODO: liiiinks].
+[Schnorr signatures][bip340], [Taproot][bip341], [Tapscript][bip342] and
+[MuSig2][bip327].
 
 Ok, enough chit-chat. Onto the good stuff!
 
@@ -43,7 +44,8 @@ your private key, `d`, produces a public key, `P`, with an odd y-coordinate,
 then all you need to do is _negate_ your private key. This will produce public
 key `P’` which has the same x-coordinate as your original public key but with an
 even y-coordinate. For more information regarding BIP340 public keys and
-signatures (also known as Schnorr signatures), then checkout the BIP itself.
+signatures (also known as Schnorr signatures), then checkout the [BIP][bip340] 
+itself.
 
 ![](/taprootPrelims/curve.png#center)
 
@@ -88,9 +90,9 @@ negate your private key first.
 Now, what if you instead wanted to use an n-of-n aggregate MuSig2 public key?
 Turns out that this will look _exactly_ the same on-chain as for the single key 
 case explained above! All that changes is the steps that you and your fellow 
-signers need to take to setup the aggregate public key and then to calculate the
-final signature. But once all that is complete, what ends up on-chain looks no 
-different.
+signers need to take to set up the aggregate public key and then to calculate 
+the final signature. But once all that is complete, what ends up on-chain looks 
+no different.
 
 ![](/taprootPrelims/musig-output.png#center)
 
@@ -101,9 +103,9 @@ spending your Taproot output via a script _and_ each output can have multiple
 scripts from which it can be spent. Another cool thing is that if you choose to 
 include script paths in your Taproot output, you can still add a regular key 
 path like before. Let’s say, for example, that you want to be able to spend your
-output at any time, but you also want add three script paths so that it can also
-be spent in other scenarios: perhaps after 30 days you want your partner to be 
-able to spend the output. That would be one script path. If you also have two 
+output at any time, but you also want to add three script paths so that it can 
+also be spent in other scenarios: perhaps after 30 days you want your partner to 
+be able to spend the output. That would be one script path. If you also have two 
 other script paths (perhaps one is a 2-of-3 multi-sig and the other requires a 
 pre-image reveal), then your Taproot output would be constructed as follows:
 
@@ -112,18 +114,19 @@ pre-image reveal), then your Taproot output would be constructed as follows:
 Let’s walk through the above diagram a bit:
 
 First, the three scripts (`Script A`, `Script B` and `Script C`) are all put 
-into a [Merkle tree](link) as shown bottom right. The root of this Merkle tree 
+into a [Merkle tree][merkle] as shown bottom right. The root of this Merkle tree 
 is then hashed along with our internal key, `P`, to get the 32-byte tweak, `t`. 
 This tweak is converted to its elliptic curve point form by multiplying it with 
 the generator point, `G`, to get `T` which is then added to our internal key, 
-`P`, to get the final output key, `Q`. I have skipped over some details here 
-such as the details of the script encodings and also how the scripts are hashed 
-in the Merkle tree so checkout the relevant BIPs if you are interested.
+`P`, to get the final output key, `Q`. I have skipped over some things here such
+as the details of the script encodings and also how the scripts are hashed in 
+the Merkle tree so checkout the relevant BIPs if you are interested.
 
-Alrighty - our fancy Taproot output has been setup! But now… how do we spend it?
-There are two ways of spending this transaction: the first is via the internal 
-key, `P`. We call this a _key path spend_. The other way is via one of the 
-scripts in the tree. This type of spend is called a _script path spend_.
+Alrighty - our fancy Taproot output has been set up! But now… how do we spend 
+it? There are two ways of spending this transaction: the first is via the 
+internal key, `P`. We call this a [_key path spend_](#key-path-spends). The 
+other way is via one of the scripts in the tree. This type of spend is called a 
+[_script path spend_](#script-path-spends).
 
 ### Key Path Spends
 
@@ -156,7 +159,7 @@ put in what is called the “control block”. The first thing in the control bl
 is the internal key, `P`. It also contains the Merkle proof that allows the 
 verifier to compute the Merkle tree root. The witness already includes 
 `Script B` itself (it was required for step 1), so the verifier can compute 
-`hB` (see the diagram above showing the Merkle tree construction) themselves 
+`hB` (see the diagram above showing the Merkle tree construction) themselves, 
 and so we just need to provide `hA` and `hC`. The validator will use these 
 hashes to calculate the `script_root` and then hash this along with the 
 internal key, `P`, in order to arrive at the tweak, `t`. The validator can then 
@@ -170,7 +173,9 @@ y-coordinate.
 
 It is important to note that no knowledge of `d` (the private key for the 
 internal key, `P`) was required for spending via `Script B` (assuming of course 
-that `Script B` itself does not involve `P`). 
+that `Script B` itself does not involve `P`). Another cool thing is that we did
+not need to reveal the contents of the other scripts in the tree, only their
+hashes. 
 
 ### BIP86 Tweaks
 
@@ -185,7 +190,7 @@ Spending this output can now only be done via the key spend path using private
 key `d + t`. Then, `P` can be provided to any third parties who want proof that 
 there is no script path. They would use `P` to compute `t` and `T` and then 
 would verify that `P + T` is equal to the output key, `Q`. More info about this 
-can be found in [BIP86](link). 
+can be found in [BIP86][bip86-tweak]. 
 
 # MuSig2
 
@@ -209,14 +214,14 @@ signature. MuSig2 is the protocol that defines how this should be done. The
 various steps have been carefully thought through in order to keep the process 
 trust-less and to protect parties from attacks such as key cancellation.
 
-BIP<???> defines the MuSig2 protocol along with a bunch of algorithms that 
-should be used for the various steps of the process. Since the aim of this 
+[BIP327][bip327] defines the MuSig2 protocol along with a bunch of algorithms 
+that should be used for the various steps of the process. Since the aim of this 
 article is to provide all the building blocks required for understanding 
 Lightning Taproot channels, I will only talk about MuSig2 at an API level using 
 the defined algorithms and will focus more on how it will be used in Lightning. 
-If you would like to dig into it more you can checkout the BIP itself. I have 
-also implemented all the MuSig2 methods from scratch [here](schnorr repo link) 
-if you are the type of person who prefers looking at code. 
+If you would like to dig into it more you, can check out the BIP itself. I have 
+also implemented all the MuSig2 methods from scratch [here][musig2-impl] if you 
+are the type of person who prefers looking at code. 
 
 ## MuSig2 vs n-of-n Multisig
 
@@ -292,3 +297,12 @@ more on that in the next blog post :)
 Thanks for reading! I hope that was useful. If you think there is anything that 
 could use clarification or that is incorrect then please don’t hesitate to reach
 out to let me know. 
+
+[pre-tap-chans]: ../../posts/open_channel_pre_taproot
+[bip340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
+[bip341]: https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki
+[bip342]: https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki
+[bip327]: https://github.com/bitcoin/bips/blob/master/bip-0327.mediawiki
+[merkle]: https://en.wikipedia.org/wiki/Merkle_tree
+[bip86-tweak]: https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki#address-derivation
+[musig2-impl]: https://github.com/ellemouton/schnorr/tree/master/musig2
