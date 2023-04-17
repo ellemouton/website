@@ -199,7 +199,7 @@ signatures (or Schnorr signatures). The beauty of these signatures is their
 linearity: the owner of public key `P_1` can create a partial signature, 
 `sig_1` for the message `msg` and the owner of public key `P_2` can create 
 `sig_2` for the same message. The two parties will then be able to combine their 
-signatures such that `sig` where `sig = `sig_1 + sig_2` is a valid signature for 
+signatures such that `sig` where `sig = sig_1 + sig_2` is a valid signature for 
 the aggregate of their public keys: `P = P_1 + P_2`.
 
 This is really cool because it means that instead of needing to create a long 
@@ -210,9 +210,10 @@ _aggregate_ public key) needs to appear on-chain.
 
 The tricky part here is everything that needs to happen _off-chain_ during the 
 setup of this aggregate public key as well as for the creation of the final 
-signature. MuSig2 is the protocol that defines how this should be done. The 
-various steps have been carefully thought through in order to keep the process 
-trust-less and to protect parties from attacks such as key cancellation.
+signature. [MuSig2][bip327] is the protocol that defines how this should be 
+done. The various steps have been carefully thought through in order to keep 
+the process trust-less and to protect parties from attacks such as key 
+cancellation.
 
 [BIP327][bip327] defines the MuSig2 protocol along with a bunch of algorithms 
 that should be used for the various steps of the process. Since the aim of this 
@@ -291,7 +292,7 @@ of a channel will be a MuSig2 aggregate public key. This means that every
 commitment transaction created that spends from the funding output will need to 
 go through this signing flow. Since channel states in Lightning are asymmetric, 
 this also means that this flow will need to happen twice per state update: once 
-to sign the local commitment transaction and one to sign the remote one. But 
+to sign the local commitment transaction and once to sign the remote one. But 
 more on that in the next blog post :)
 
 Thanks for reading! I hope that was useful. If you think there is anything that 
