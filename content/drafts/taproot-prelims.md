@@ -24,8 +24,8 @@ these topics. Instead, this post is aimed at refreshing your memory on these
 topics or giving you enough of an understanding of how Taproot outputs and 
 MuSig2 work so that the follow-up articles are more easily digestible. There are
 better articles out there for you if you want to get into the nitty-gritty of 
-these topics and of course you can always go checkout the BIPs if you are brave:
-[Schnorr signatures][bip340], [Taproot][bip341], [Tapscript][bip342] and
+these topics and of course you can always go check out the BIPs if you are 
+brave: [Schnorr signatures][bip340], [Taproot][bip341], [Tapscript][bip342] and
 [MuSig2][bip327].
 
 Ok, enough chit-chat. Onto the good stuff!
@@ -164,7 +164,7 @@ and so we just need to provide `hA` and `hC`. The validator will use these
 hashes to calculate the `script_root` and then hash this along with the 
 internal key, `P`, in order to arrive at the tweak, `t`. The validator can then 
 compute the corresponding tweak point, `T`, add that to the internal key, `P`, 
-to get the output key `Q`. The final thing that the control block must include 
+to get the output key, `Q`. The final thing that the control block must include 
 is a bit indicating if the final `Q` point has an odd or even y-coordinate so 
 that the validator can check if the `Q` they computed does have the correct 
 y-coordinate.
@@ -220,7 +220,7 @@ that should be used for the various steps of the process. Since the aim of this
 article is to provide all the building blocks required for understanding 
 Lightning Taproot channels, I will only talk about MuSig2 at an API level using 
 the defined algorithms and will focus more on how it will be used in Lightning. 
-If you would like to dig into it more you, can check out the BIP itself. I have 
+If you would like to dig into it more you can check out the BIP itself. I have 
 also implemented all the MuSig2 methods from scratch [here][musig2-impl] if you 
 are the type of person who prefers looking at code. 
 
