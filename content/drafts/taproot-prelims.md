@@ -44,7 +44,7 @@ your private key, `d`, produces a public key, `P`, with an odd y-coordinate,
 then all you need to do is _negate_ your private key. This will produce public
 key `P’` which has the same x-coordinate as your original public key but with an
 even y-coordinate. For more information regarding BIP340 public keys and
-signatures (also known as Schnorr signatures), then checkout the [BIP][bip340] 
+signatures (also known as Schnorr signatures), checkout the [BIP][bip340] 
 itself.
 
 ![](/taprootPrelims/curve.png#center)
