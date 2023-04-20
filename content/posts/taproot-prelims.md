@@ -44,7 +44,7 @@ your private key, `d`, produces a public key, `P`, with an odd y-coordinate,
 then all you need to do is _negate_ your private key. This will produce public
 key `P’` which has the same x-coordinate as your original public key but with an
 even y-coordinate. For more information regarding BIP340 public keys and
-signatures (also known as Schnorr signatures), checkout the [BIP][bip340] 
+signatures (also known as Schnorr signatures), check out the [BIP][bip340] 
 itself.
 
 ![](/taprootPrelims/curve.png#center)
@@ -120,7 +120,7 @@ This tweak is converted to its elliptic curve point form by multiplying it with
 the generator point, `G`, to get `T` which is then added to our internal key, 
 `P`, to get the final output key, `Q`. I have skipped over some things here such
 as the details of the script encodings and also how the scripts are hashed in 
-the Merkle tree so checkout the relevant BIPs if you are interested.
+the Merkle tree so check out the relevant BIPs if you are interested.
 
 Alrighty - our fancy Taproot output has been set up! But now… how do we spend 
 it? There are two ways of spending this transaction: the first is via the 
@@ -194,7 +194,7 @@ can be found in [BIP86][bip86-tweak].
 
 # MuSig2
 
-With the Taproot softfork, bitcoin nodes now have an understanding of BIP340 
+With the Taproot soft fork, bitcoin nodes now have an understanding of BIP340 
 signatures (or Schnorr signatures). The beauty of these signatures is their 
 linearity: the owner of public key `P_1` can create a partial signature, 
 `sig_1` for the message `msg` and the owner of public key `P_2` can create 
