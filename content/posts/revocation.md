@@ -5,9 +5,10 @@ date: 2021-03-23
 aliases:
   - /blog/view/5
   - /revocation   
----
 
- ![](/lnThings/something.png#center)
+cover:
+  image: "/lnThings/something.png"
+---
 
 In Part 2 I gave an overview of how two participants of a payment channel go about agreeing on a state and how they update their state. In this post we will look at the scripts used in the commitment transactions and dig into the revocation key process a bit more.
 

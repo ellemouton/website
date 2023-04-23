@@ -5,9 +5,10 @@ date: 2021-03-26
 aliases:
   - /blog/view/6
   - /htlc   
----
 
- ![](/lnThings/htlc_heading.png#center)
+cover:
+  image: "/lnThings/htlc_heading.png"
+---
 
 The previous 2 posts were all about sending funds between the two participants of a channel (agreeing on current state and invalidating older state). This post will give an overview of HTLCs and how they allow multi-hop payments to be made. The next post will be a deep dive into exactly what these HTLCs look like and how they fit into the commitment transactions of a channel.
 

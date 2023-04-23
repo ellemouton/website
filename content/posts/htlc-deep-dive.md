@@ -6,9 +6,9 @@ aliases:
   - /blog/view/7
   - /htlc-deep-dive
 
+cover:
+  image: "/lnThings/bolt.png"
 ---
-
- ![](/lnThings/bolt.png#center)
 
 In previous post gave a simplified overview of HTLCs. This post will look in more detail at what these HTLCs actually look like and how they fit in the commitment transactions.
 

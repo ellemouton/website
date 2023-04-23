@@ -5,9 +5,10 @@ date: 2021-03-22
 aliases:
   - /blog/view/4
   - /updating-state   
----
 
- ![](/lnThings/update.png#center)
+cover:
+  image: "/lnThings/update.png"
+---
 
 Today’s post is more of a set up for the next one. It describes the basics of the Lightning Network update layer using LN-Penalty. The next post will introduce HTLCs and then will dive into how the HTLCs fit into commitment transactions and how this plays along with the update layer.
 
