@@ -3,7 +3,7 @@ title: "Taproot and MuSig2 recap"
 summary: "A recap of the building blocks required for Taproot channels"
 date: 2023-04-18
 aliases:
-- /taproot_recap
+  - /taproot_recap
 
 cover:
     image: "/taprootPrelims/cover.png"

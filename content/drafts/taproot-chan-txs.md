@@ -2,8 +2,6 @@
 title: "Taproot Channel Transactions"
 summary: "A deep-dive into the structure of Taproot channel transactions"
 date: 2023-04-23
-aliases:
-- /taproot_recap
 
 cover:
     image: "/taprootChanTxs/taproot-chans-cover.png"
@@ -13,21 +11,28 @@ Hold on to your hats folks, things are about to get real.
 
 # Overview
 
-In this post, I will dive into the structure of Taproot-channel funding and
-commitment transactions. If you missed my [previous post](link) about Taproot
-and MuSig2, it might be a good idea to read that one first for a recap of the
-building blocks that will be used throughout this post. If you perhaps also need
-a re-cap of the general structure of commitment transactions then check
-out [this](link) post where I cover why each output in a commitment transaction
-looks the way it does.
+In this post, I will dive into the structure of Taproot channel funding and
+commitment transactions. If you missed my [previous post][taproot-prelims] about
+Taproot and MuSig2, it might be a good idea to read that one first for a recap
+of the building blocks that will be used throughout this post. If you perhaps
+also need a re-cap of the general structure of commitment transactions then
+check out [this][htlc-deep-dive] post where I cover why each output in a
+commitment transaction looks the way it does.
 
 Note that Taproot Channels are still in the design phase and so until
-the [the proposal] by the one and only [Roasbeef] is merged, this blog post will
-be a living document that I will update if any changes are made to the proposal.
-There are currently even a few open questions in the proposal which I will try
-to illustrate here.
+the [proposal][tap-chan-bolt-pr] by the one and only [Roasbeef][roasbeef] is
+merged, this blog post will be a living document that I will update if any
+changes are made to the proposal. There are currently even a few open questions
+in the proposal which I will try to illustrate here.
+
+If you have read some of my previous blog posts, you might have noticed that I
+love to make use of diagrams. Well this post is diagrams on steroids. To help
+with understanding, here is a legend showing what each colour generally 
+represents:
 
 ![](/taprootChanTxs/colour-legend.png#center)
+
+Ok, ready? Let's dive in!
 
 # Funding Transaction Output
 
@@ -35,7 +40,7 @@ Here is a diagram showing how a Taproot-channel funding output is constructed:
 
 ![](/taprootChanTxs/funding-output.png#center)
 
-The two parties in a the channel, the local and remote peer, use the MuSig2
+The two parties in a channel, the local and remote peer, use the MuSig2
 protocol to aggregate their individual funding keys, `P_a` and `P_b`, into the
 aggregate key, `P_agg`, which is also the internal key. This internal key is
 then tweaked with a BIP86 tweak. You might recall from the previous post that a
@@ -323,3 +328,8 @@ confirmed.
 
 The key path and script path spend scripts are exactly the same as for
 the `to_local` output.
+
+[taproot-prelims]: ../../posts/taproot-prelims
+[htlc-deep-dive]: ../../posts/htlc-deep-dive
+[tap-chan-bolt-pr]: https://github.com/lightning/bolts/pull/995
+[roasbeef]: https://twitter.com/roasbeef
