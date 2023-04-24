@@ -164,7 +164,7 @@ effectively cancels out the key path.
 
 Some [reviewers][nums-over-pagg] of the proposal have noted that using `P_agg`
 as the internal key here makes recovery for the remote peer basically impossible
-if they find them selves in a situation where they have lost all channel data,
+if they find themselves in a situation where they have lost all channel data,
 all channel backups and only have their master seed left. With legacy channels,
 remote parties who have lost all their channel data are still able to scan the
 chain for `to_remote` outputs that belong to them since they know the derivation
@@ -216,7 +216,7 @@ spending script? The answer is: yes, but only if you know what `P_remote` is!
 Before reading on, I suggest taking some time to think about how you could
 possibly come to know what `P_remote` is. It is not present in the funding
 transaction, nor is it present in the commitment transaction. Scroll up through
-the diagrams to see if you can see where it revealed.
+the diagrams to see if you can see where it is revealed.
 
 Ok ready? It is only revealed if the `to_remote` output is spent as it appears
 in the witness required to spend that output. This means that the remote anchor
