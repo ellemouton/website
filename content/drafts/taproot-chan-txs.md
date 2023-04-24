@@ -1,7 +1,7 @@
 ---
 title: "Taproot Channel Transactions"
 summary: "A deep-dive into the structure of Taproot channel transactions"
-date: 2023-04-23
+date: 2023-04-24
 
 cover:
     image: "/taprootChanTxs/taproot-chans-cover.png"
@@ -36,7 +36,30 @@ Ok, ready? Let's dive in!
 
 # Funding Transaction Output
 
-Here is a diagram showing how a Taproot-channel funding output is constructed: 
+The funding transaction output is the output that defines the opening of the
+channel. In pre-taproot channels, this output pays into a 2-of-2 multisig
+meaning that any transaction (commitment or closing transaction) spending from
+the output must be signed by both channel peers. Since the output is a P2SH, 
+once it is spent, the underlying 2-of-2 multisig is revealed in the witness and
+so it becomes pretty clear to anyone observing the chain that the transaction 
+was for a Lightning channel.
+
+In the case of Taproot channels, this output is now a 2-of-2 MuSig2. Both
+parties will still need to sign each transaction that spends from the output,
+however, the signatures will now be aggregated via the MuSig2 protocol into a
+single signature. This means that in the ideal case where the channel is closed
+in a cooperative manner, the channel will look no different from any other P2TR
+key-path spend. This is a huge privacy improvement for unannounced channels
+since there is no way to tell that the transaction was for a Lightning channel,
+and it never gets advertised to the network through the gossip protocol. As for
+announced Taproot channels, the gossip protocol will actually need to be
+completely re-designed to support the new channel type and there is currently an
+ongoing debate around if this new gossip version should advertise the channel's
+funding transaction at all or not. More on Taproot channel gossip in a future
+post.
+
+Here is a diagram showing how a Taproot channel funding output is
+constructed:
 
 ![](/taprootChanTxs/funding-output.png#center)
 
@@ -58,6 +81,12 @@ funding output.
 
 ![](/taprootChanTxs/funding-keypath.png#center)
 
+Notice that unlike in pre-taproot channels where spending from the funding
+output would require two signatures created completely independently of each
+other, in Taproot channels, the signatures are created in an interactive manner
+between the peers. I will cover the details of how exactly this affects the
+interaction between the peers in the next blog post.
+
 # Commitment Transaction Outputs
 
 There are six different outputs that a commitment transaction can have. These
@@ -66,22 +95,21 @@ outputs, the offered htlc output and the accepted htlc output. Let’s dive in.
 
 ## The `to_local` output
 
-The `to_local` output is responsible for paying the local peer all the funds in
-the channel that belong to them that are not currently committed to an HTLC. The
-output must be revocable by the remote party and then only after `to_self_delay`
-blocks should the local party be able to spend from the output. The revocation
-key is used as the internal key and the to-local delayed script is then placed
-in the TapTree.
+The `to_local` output is responsible for paying the local peer their channel
+balance. The output must be revocable by the remote party at all times and only
+after `to_self_delay` blocks should the local party be able to spend from the
+output. The revocation key is used as the internal key and the to-local delayed
+script is then placed in the TapTree.
 
 ![](/taprootChanTxs/to-local-output.png#center)
 
 ### Key path spend
 
-The revocation key which will only be spendable by the remote peer _iff_ the
-state associated with this commitment transaction has been revoked (see more on
-revocation “here”) . Thus, if the local party tries to cheat the remote party by
-publishing an old state, the remote party will be able to sweep via the key
-spend path which also the most cost effective spending path.
+The internal key is the revocation key which will only be spendable by the
+remote peer _iff_ the state associated with this commitment transaction has been
+revoked (see more on revocation “here”) . Thus, if the local party tries to
+cheat the remote party by publishing an old state, the remote party will be able
+to sweep via the key path which is also the most cost-effective spending path.
 
 ![](/taprootChanTxs/to-local-key-path.png#center)
 
@@ -95,27 +123,38 @@ diagram shows the witness that will be required to spend this path:
 
 ![](/taprootChanTxs/to-local-script-spend.png#center)
 
-It contains a witness script for the local-delayed script. This witness only
-requires a valid signature from the local party. The script itself must also be
-revealed and finally, the control block must be specified. In this case, it only
-contains the parity bit of `to_local` output’s output key along with the
-internal key. Note that no inclusion proof needs to be included in the control
-block since there is only one script in the TapTree which means that the script
-root can be calculated straight from the local-delayed script.
+It contains a witness for the local-delayed script which is a valid signature
+from the local party for their key, `P_local_delayed`. The script itself must
+also be revealed and finally, the control block must be specified. In this case,
+the control block only contains the parity bit of `to_local` output’s output key
+along with the internal key. Note that no inclusion proof needs to be included
+in the control block since there is only one script in the Taproot script tree
+which means that the script root can be calculated straight from the
+local-delayed script.
 
 ## The `to_remote` output
 
-This output pay’s the remote party their channel balance. As with all anchor
-channels, all non-anchor outputs must have a CSV of at least 1 so as to not
-break the CPFP-carveout rule. Therefore, the remote party is only allowed access
-to their funds after one confirmation. This type of requirement can only be
-added in a script and so this output also makes use of the TapTree.
+This output pays the remote party their channel balance. As with all anchor
+channels, any non-anchor outputs must have a CSV of at least one to not break
+the [CPFP carve out][carveout] rule. Therefore, the remote party is only allowed
+access to their funds after one confirmation. This type of requirement can only
+be added in a script and so this output also makes use of the Taproot script
+tree.
 
 ![](/taprootChanTxs/to-remote-output.png#center)
 
+You might think there is a mistake in the diagram above in the to-remote script.
+I said before that we want to enforce a CSV of one here and yet the script does
+not have `OP_1` in it. This is in-fact not a mistake but a cool Script trick! 
+If the `<remotepubkey> OP_CHECKSIG` check fails, then the script will fail 
+immediately. However, if it passes, it will push the `OP_1` to the stack that 
+we will use in the CSV check. It does, however, seem as if this neat trick might
+be replaced with a more explicit `OP_1 OP_CHECKSEQUENCEVERIFY` for legibility 
+reasons.
+
 At this point, you are likely wondering about the internal key. We only require
-one spend path for this output but unfortunately we had to put it in the
-TapTree. We still have to set an internal key, however, even though we don’t
+one spend path for this output, but unfortunately we had to put it in the
+script tree. We still have to set an internal key, however, even though we don’t
 ever want anyone to be able to spend from it. From the diagram you can see that
 the spec currently sets this key to the same aggregate public key used in the
 funding transaction. The idea here being that if `P_agg` internal key, then we
@@ -123,19 +162,19 @@ know that it would require cooperation among the two peers to spend via this key
 but there is really no reason for either party to want to do so. This
 effectively cancels out the key path.
 
-Some [reviewers]() of the proposal have noted that using `P_agg` as the internal
-key here makes recovery for the remote peer basically impossible if they find
-them selves in a situation where they have lost all channel data, all channel
-backups and only have their master seed left. With legacy channels, remote
-parties who have lost all their channel data are still able to scan the chain
-for `to_remote` outputs that belong to them since they know the derivation path
-that would be used for deriving these keys. This property will be lost
+Some [reviewers][nums-over-pagg] of the proposal have noted that using `P_agg`
+as the internal key here makes recovery for the remote peer basically impossible
+if they find them selves in a situation where they have lost all channel data,
+all channel backups and only have their master seed left. With legacy channels,
+remote parties who have lost all their channel data are still able to scan the
+chain for `to_remote` outputs that belong to them since they know the derivation
+path that would be used for deriving these keys. This property will be lost
 if `P_agg` is used as the internal key in the Taproot channel case because the
 remote party would not be able to derive it and thus would not be able to scan
 the chain for their outputs. It has therefore been suggested that instead of
-using `P_agg` here, that a public NUMS point be used instead. If a public NUMS
-point is used, then the remote nodes will once again retain the ability to scan
-the chain for `to_remote` outputs belonging to them.
+using `P_agg` here, that a public [NUMS][nums] point be used instead. If a
+public NUMS point is used, then the remote nodes will once again retain the
+ability to scan the chain for `to_remote` outputs belonging to them.
 
 ### Script path spend
 
@@ -151,14 +190,15 @@ commitment transaction if required. The remote party’s public key is thus used
 as the internal key. To ensure that this output (a very small output of only 330
 satoshis) is definitely cleaned up at some point from the UTXO set, another
 output path is added which allows anyone to spend the output after it has been
-confirmed for 16 blocks. This extra path is added as a script in the TapTree.
+confirmed for 16 blocks. This extra path is added as a script in the script 
+tree.
 
 ![](/taprootChanTxs/remote-anchor-output.png#center)
 
 ### Key path spend
 
-The key spend path just requires a signature from the remote party which they
-will tweak with the TapTweak.
+Spending via the key path just requires a signature from the remote party which
+they will tweak with the TapTweak.
 
 ![](/taprootChanTxs/remote-anchor-key-path.png#center)
 
@@ -188,14 +228,14 @@ spent.
 This is the output that you, the local party, will be able to use to CPFP the
 commitment transaction. And just like the remote anchor, it is spendable by
 anyone after 16 blocks. So the internal key is `P_local_delayed` and the “anyone
-can spend after 16 blocks” script is put in the TapTree.
+can spend after 16 blocks” script is put in the script tree.
 
 ![](/taprootChanTxs/local-anchor-output.png#center)
 
 ### Key path spend
 
-The key spend path just requires a signature from the local party which they
-will tweak with the TapTweak.
+Spending via the key path just requires a signature from the local party which
+they will tweak with the TapTweak.
 
 ![](/taprootChanTxs/local-anchor-key-spend.png#center)
 
@@ -218,21 +258,22 @@ case `P_local_delayed` will not be revealed. In that case only the two channel
 peers would ever have the information required to spend the local anchor.
 
 An alternative that has been suggested is that the `to_local` output be changed
-so as to force the reveal of `P_local_delayed` no matter how it is spent. This
-could be done by changing the keyspend path to be a public NUMS point and then
-moving the revocation path to the TapTree and adjusting the script so that
+to force the reveal of `P_local_delayed` no matter how it is spent. This could
+be done by changing the key path to be a public NUMS point and then moving the
+revocation path to the script tree and adjusting the script so that
 the `P_local_delayed` key is embedded in it so that it must be revealed if the
-revocation path is spent. The down side here is that this increases the spend
+revocation path is spent. The downside here is that this increases the spend
 cost of both output paths of the `to_local` output. The question comes down to
-how much we want to cater for this very rare edge case. 
+how much we want to cater for this very rare edge case.
 
 ## Offered HTLC Output
 
 An offered HTLC pays out to the remote party if they reveal the pre-image to a
 given hash before a certain CLTV timeout. After the timeout, the local party
 will be able to claim the output via the htlc-timeout transaction (details on
-that below). If the commitment transaction is a revoked state, then the remote
-party should be able to sweep the output at any time.
+that [below](#htlc-timeout-and-success-transactions)). If the commitment
+transaction is a revoked state, then the remote party should be able to sweep
+the output at any time.
 
 ![](/taprootChanTxs/offered-htlc-output.png#center)
 
@@ -248,9 +289,9 @@ signature:
 ### Script path spends
 
 The other two spend paths, the success and timeout paths, are placed in the
-TapTree and spending either of them requires providing a valid witness for the
-script, the script itself and a control block which this time does include an
-inclusion proof since more than one script is present in the TapTree. 
+script tree and spending either of them requires providing a valid witness for
+the script, the script itself and a control block which this time does include
+an inclusion proof since more than one script is present in the tree.
 
 #### Success Path
 
@@ -260,10 +301,10 @@ To spend via the success path, the following witness is required.
 
 #### Timeout Path
 
-The following witness is required to spend via the timeout path. Transaction
-spending the timeout path is the htlc-timeout transaction. More details on that
-transaction later on. If you need a recap on the reason why second-stage htlc
-transactions are necessary, check out [this] post. 
+The following witness is required to spend via the timeout path. The transaction
+that will spend the timeout path is the htlc-timeout transaction - more details
+on that transaction later on. If you need a recap on the reason why second-stage
+htlc transactions are necessary, check out [this][htlc-deep-dive] post.
 
 ![](/taprootChanTxs/offered-htlc-timeout.png#center)
 
@@ -272,8 +313,8 @@ transactions are necessary, check out [this] post.
 The accepted HTLC output pays out to an htlc-success transaction if we (the
 local party) are able to provide the pre-image for the given payment hash.
 Otherwise, after a certain `cltv_expiry`, the remote party will be able to sweep
-the funds back. If the commitment transaction is a revoked state, then the
-remote party should be able to sweep the output at any time.
+the funds back via the timeout path. If the commitment transaction is a revoked
+state, then the remote party should be able to sweep the output at any time.
 
 ![](/taprootChanTxs/accepted-htlc-output.png#center)
 
@@ -289,9 +330,9 @@ signature:
 ### Script path spends
 
 The other two spend paths, the success and timeout paths, are placed in the
-TapTree and spending either of them requires providing a valid witness for the
-script, the script itself and a control block which this time does include an
-inclusion proof since more than one script is present in the TapTree.
+script tree and spending either of them requires providing a valid witness for
+the script, the script itself and a control block which this time does include
+an inclusion proof since more than one script is present in the tree.
 
 #### Success Path
 
@@ -329,7 +370,21 @@ confirmed.
 The key path and script path spend scripts are exactly the same as for
 the `to_local` output.
 
+# Wrap Up
+
+If you have made it all the way through that, congrats! You should now have a 
+pretty solid understanding of the structure of Taproot channel commitment 
+transactions. My next blog post will cover how the various channel peer messages
+will need to be updated to support MuSig2 signing. I expect it to be a short and 
+sweet one.
+
+As always, if you have any questions, comments or corrections, please feel free
+to reach out to me.
+
 [taproot-prelims]: ../../posts/taproot-prelims
 [htlc-deep-dive]: ../../posts/htlc-deep-dive
 [tap-chan-bolt-pr]: https://github.com/lightning/bolts/pull/995
 [roasbeef]: https://twitter.com/roasbeef
+[carveout]: https://bitcoinops.org/en/topics/cpfp-carve-out/
+[nums-over-pagg]: https://github.com/lightningnetwork/lnd/pull/7333#discussion_r1082384984
+[nums]: https://en.wikipedia.org/wiki/Nothing-up-my-sleeve_number
