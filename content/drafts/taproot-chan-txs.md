@@ -1,7 +1,7 @@
 ---
 title: "Taproot Channel Transactions"
 summary: "A deep-dive into the structure of Taproot channel transactions"
-date: 2023-04-24
+date: 2023-04-25
 
 cover:
     image: "/taprootChanTxs/taproot-chans-cover.png"
