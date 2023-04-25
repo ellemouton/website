@@ -355,11 +355,13 @@ one diagram to describe both:
 
 ![](/taprootChanTxs/htlc-txs.png#center)
 
-The only difference between the htlc-success and htlc-timeout transactions would
-be the inputs they are spending and hence, the witness required for spending
+The first difference between the htlc-success and htlc-timeout transactions is
+the input they are spending and hence, the witness required for spending
 that input. The htlc-timeout transaction spends the timeout path of the offered
 HTLC output and the htlc-success transaction spends the success path of the
-accepted HTLC output.
+accepted HTLC output. The other difference is the `Locktime`: the htlc-timeout
+transaction has a `Locktime` of `cltv_expiry` and the htlc-success transaction
+has a `Locktime` of zero.
 
 The outputs of the htlc-success and htlc-timeout transactions are identical:
 they are immediately spendable by the remote party via the revocation path if
