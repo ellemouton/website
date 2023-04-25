@@ -381,7 +381,7 @@ will need to be updated to support MuSig2 signing. I expect it to be a short and
 sweet one.
 
 As always, if you have any questions, comments or corrections, please feel free
-to reach out to me.
+to leave a comment down below :) 
 
 [taproot-prelims]: ../../posts/taproot-prelims
 [htlc-deep-dive]: ../../posts/htlc-deep-dive
