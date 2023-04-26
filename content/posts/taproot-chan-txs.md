@@ -107,9 +107,10 @@ script is then placed in the TapTree.
 
 The internal key is the revocation key which will only be spendable by the
 remote peer _iff_ the state associated with this commitment transaction has been
-revoked (see more on revocation “here”) . Thus, if the local party tries to
-cheat the remote party by publishing an old state, the remote party will be able
-to sweep via the key path which is also the most cost-effective spending path.
+revoked (see more on revocation [here][updating-state] and [here][revocation]) .
+Thus, if the local party tries to cheat the remote party by publishing an old
+state, the remote party will be able to sweep via the key path which is also the
+most cost-effective spending path.
 
 ![](/taprootChanTxs/to-local-key-path.png#center)
 
@@ -385,6 +386,8 @@ to leave a comment down below :)
 
 [taproot-prelims]: ../../posts/taproot-prelims
 [htlc-deep-dive]: ../../posts/htlc-deep-dive
+[updating-state]: ../../posts/updating-state
+[revocation]: ../../posts/revocation
 [tap-chan-bolt-pr]: https://github.com/lightning/bolts/pull/995
 [roasbeef]: https://twitter.com/roasbeef
 [carveout]: https://bitcoinops.org/en/topics/cpfp-carve-out/
