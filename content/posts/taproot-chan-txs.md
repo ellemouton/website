@@ -22,8 +22,8 @@ commitment transaction looks the way it does.
 Note that Taproot Channels are still in the design phase and so until
 the [proposal][tap-chan-bolt-pr] by the one and only [Roasbeef][roasbeef] is
 merged, this blog post will be a living document that I will update if any
-changes are made to the proposal. There are currently even a few open questions
-in the proposal which I will try to illustrate here.
+changes are made to the proposal. This is currently up-to-date as of commit 
+[e95e7a][commit].
 
 If you have read some of my previous blog posts, you might have noticed that I
 love to make use of diagrams. Well this post is diagrams on steroids. To help
@@ -33,6 +33,17 @@ represents:
 ![](/taprootChanTxs/colour-legend.png#center)
 
 Ok, ready? Let's dive in!
+
+# A quick note on NUMS points
+
+A NUMS point, or a nothing-up-my-sleeves point, is a public key that no one
+knows the private key to and that is derived from a string binding it to the
+context that it is being used in. The NUMS point used in taproot channels is
+derived from the string “Lightning Simple Taproot” using [this NUMS generation 
+tool][nums-derive]. Since no one knows the private key for the NUMS point, it 
+can be used as the internal key for a Taproot output in order to effectively 
+cancel out the possibility of a key-path spend since no one would be able to 
+create a valid signature for it.
 
 # Funding Transaction Output
 
@@ -98,40 +109,58 @@ outputs, the offered htlc output and the accepted htlc output. Let’s dive in.
 The `to_local` output is responsible for paying the local peer their channel
 balance. The output must be revocable by the remote party at all times and only
 after `to_self_delay` blocks should the local party be able to spend from the
-output. The revocation key is used as the internal key and the to-local delayed
-script is then placed in the TapTree.
+output. As you can see in the diagram below, both these paths are added as Taproot
+leaves in the Taproot tree and a public NUMS point is used as the internal key
+which effectively cancels out the key-spend path. You might be asking yourself
+why the revocation pub key is not used as the internal key and this is a good
+question since that is in fact how the output was in the original design. But
+you can see from the diagram below that the revocation script does not only
+contain the revocation public key but also strangely contains the 
+`P_local_delay` key. Notice also that the key is not followed by `OP_CHECKSIG` 
+but rather just by an `OP_DROP` which means that a signature is not required for 
+the key. All that is required is that the key is revealed in the script. This 
+reveal of `P_local_delay` in the revocation path is the only reason why the 
+revocation public key could not be used as the internal key for the output. The 
+reason for this design will be made more clear in the section describing the 
+[local anchor output](#local-anchor-output). There is a good reason, I promise 
+;)
 
 ![](/taprootChanTxs/to-local-output.png#center)
 
-### Key path spend
+### Script path spends
 
-The internal key is the revocation key which will only be spendable by the
-remote peer _iff_ the state associated with this commitment transaction has been
-revoked (see more on revocation [here][updating-state] and [here][revocation]) .
-Thus, if the local party tries to cheat the remote party by publishing an old
-state, the remote party will be able to sweep via the key path which is also the
-most cost-effective spending path.
+Since the internal key of the output is a public NUMS point, it is only possible
+to spend this output via a script path.
 
-![](/taprootChanTxs/to-local-key-path.png#center)
+#### Revocation path
 
-### Script path spend
+If this commitment transaction ends up on-chain and is for a state that has
+already been revoked, then the remote party will be able to sweep the funds via
+the revocation path. They can do so with the following witness:
+
+![](/taprootChanTxs/to-local-revocation-script.png#center)
+
+It contains a signature for the revocation public key, the revocation script 
+(which includes a reveal of the `P_local_delay` key) and finally it contains a
+control block which contains the internal key (the `NUMS` key) along with an
+inclusion proof for the revocation script.
+
+#### To-local delay path
 
 If this commitment transaction ends up on-chain as part of an honest force-close
-scenario then the remote party will not be able to spend via the revocation key.
-In this case, the transaction will be spendable by the local party via the
-script path after `to_self_delay` blocks have been confirmed. The following
-diagram shows the witness that will be required to spend this path:
+scenario then the remote party will not be able to spend via the revocation
+path. In this case, the transaction will be spendable by the local party via the
+local delay script path after `to_self_delay` blocks have been confirmed. The
+following diagram shows the witness that will be required to spend this path:
 
-![](/taprootChanTxs/to-local-script-spend.png#center)
+![](/taprootChanTxs/to-local-delay-script-path.png#center)
 
 It contains a witness for the local-delayed script which is a valid signature
 from the local party for their key, `P_local_delayed`. The script itself must
 also be revealed and finally, the control block must be specified. In this case,
-the control block only contains the parity bit of `to_local` output’s output key
-along with the internal key. Note that no inclusion proof needs to be included
-in the control block since there is only one script in the Taproot script tree
-which means that the script root can be calculated straight from the
-local-delayed script.
+the control block only contains the parity bit of `to_local` output’s output 
+key, the internal key (which is the NUMS point) and the inclusion proof for the 
+to-local delay script.
 
 ## The `to_remote` output
 
@@ -144,38 +173,8 @@ tree.
 
 ![](/taprootChanTxs/to-remote-output.png#center)
 
-You might think there is a mistake in the diagram above in the to-remote script.
-I said before that we want to enforce a CSV of one here and yet the script does
-not have `OP_1` in it. This is in-fact not a mistake but a cool Script trick! 
-If the `<remotepubkey> OP_CHECKSIG` check fails, then the script will fail 
-immediately. However, if it passes, it will push the `OP_1` to the stack that 
-we will use in the CSV check. It does, however, seem as if this neat trick might
-be replaced with a more explicit `OP_1 OP_CHECKSEQUENCEVERIFY` for legibility 
-reasons.
-
-At this point, you are likely wondering about the internal key. We only require
-one spend path for this output, but unfortunately we had to put it in the
-script tree. We still have to set an internal key, however, even though we don’t
-ever want anyone to be able to spend from it. From the diagram you can see that
-the spec currently sets this key to the same aggregate public key used in the
-funding transaction. The idea here being that if `P_agg` internal key, then we
-know that it would require cooperation among the two peers to spend via this key
-but there is really no reason for either party to want to do so. This
-effectively cancels out the key path.
-
-Some [reviewers][nums-over-pagg] of the proposal have noted that using `P_agg`
-as the internal key here makes recovery for the remote peer basically impossible
-if they find themselves in a situation where they have lost all channel data,
-all channel backups and only have their master seed left. With legacy channels,
-remote parties who have lost all their channel data are still able to scan the
-chain for `to_remote` outputs that belong to them since they know the derivation
-path that would be used for deriving these keys. This property will be lost
-if `P_agg` is used as the internal key in the Taproot channel case because the
-remote party would not be able to derive it and thus would not be able to scan
-the chain for their outputs. It has therefore been suggested that instead of
-using `P_agg` here, that a public [NUMS][nums] point be used instead. If a
-public NUMS point is used, then the remote nodes will once again retain the
-ability to scan the chain for `to_remote` outputs belonging to them.
+Similarly to the `to_local` output, we use the NUMS point for the internal key
+here so that a key path spend is not possible.
 
 ### Script path spend
 
@@ -245,27 +244,16 @@ they will tweak with the TapTweak.
 Just like the remote anchor, the parties wanting to spend via the “anyone can
 spend” path require the `P_local_delayed` public key to first be revealed. This
 is revealed when the `to_local` output is spent by the local party via the
-script path.
+script path _and_ importantly this is also revealed even if the revocation path
+is taken in the `to_local` output! This is the whole reason why the internal key
+for the `to_local` output could not just be the revocation key and why we have
+to instead force a script path spend that also reveals the `P_local_delayed`
+key. From the witness below, you can see why knowledge of the `P_local_delay`
+key is required for someone to spend this anchor output via the script path. If
+it was not revealed then there is a chance that the output would remain floating
+in the UTXO set forever since third parties would not know how to spend it.
 
 ![](/taprootChanTxs/local-anchor-script-path.png#center)
-
-There is, however, one very important difference between the `to_local`
-and `to_remote` output: the `to_remote` output can only be spent via the script
-path which means that `P_remote` is always revealed. However, the `to_local`
-output can be spent via two paths! In the ideal case, it is spent via the script
-path in which case the `P_local_delayed` is revealed and there is no issue. But
-in the bad case, the `to_local` output is spent via the revocation path in which
-case `P_local_delayed` will not be revealed. In that case only the two channel
-peers would ever have the information required to spend the local anchor.
-
-An alternative that has been suggested is that the `to_local` output be changed
-to force the reveal of `P_local_delayed` no matter how it is spent. This could
-be done by changing the key path to be a public NUMS point and then moving the
-revocation path to the script tree and adjusting the script so that
-the `P_local_delayed` key is embedded in it so that it must be revealed if the
-revocation path is spent. The downside here is that this increases the spend
-cost of both output paths of the `to_local` output. The question comes down to
-how much we want to cater for this very rare edge case.
 
 ## Offered HTLC Output
 
@@ -298,7 +286,7 @@ an inclusion proof since more than one script is present in the tree.
 
 To spend via the success path, the following witness is required.
 
-![](/taprootChanTxs/offerend-htlc-success.png#center)
+![](/taprootChanTxs/offered-htlc-success.png#center)
 
 #### Timeout Path
 
@@ -391,5 +379,6 @@ to leave a comment down below :)
 [tap-chan-bolt-pr]: https://github.com/lightning/bolts/pull/995
 [roasbeef]: https://twitter.com/roasbeef
 [carveout]: https://bitcoinops.org/en/topics/cpfp-carve-out/
-[nums-over-pagg]: https://github.com/lightningnetwork/lnd/pull/7333#discussion_r1082384984
 [nums]: https://en.wikipedia.org/wiki/Nothing-up-my-sleeve_number
+[commit]: https://github.com/lightning/bolts/pull/995/commits/e95e7acbda14e07fa53c1389f952481b822db795
+[nums-derive]: https://github.com/lightninglabs/lightning-node-connect/tree/master/mailbox/numsgen
