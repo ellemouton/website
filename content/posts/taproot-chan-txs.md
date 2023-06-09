@@ -2,6 +2,8 @@
 title: "Taproot Channel Transactions"
 summary: "A deep-dive into the structure of Taproot channel transactions"
 date: 2023-04-25
+aliases:
+  - /taproot-chan-txs
 
 cover:
     image: "/taprootChanTxs/taproot-chans-cover.png"
