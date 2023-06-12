@@ -23,17 +23,20 @@ In this blog post, I will talk about the normal operations of a channel. This
 involves understanding how HTLCs are added to a channel and how channel peers
 commit to a new state including these HTLCs. Then I will cover how a channel’s
 normal flow is re-established after a disconnection and finally, the cooperative
-channel closure flow will be covered. I plan on doing this with a long-running
-example. 
+channel closure flow will be covered. I plan on doing all of this with a 
+long-running example. 
 
 # Preliminaries
 
-If you need a re-fresher on why channel peers have an asymmetric state then
-check out [this][update-stat-post] post on how channel peers update the state of 
-a channel in a trust-less way and if you want to recap how HTLCs look on a 
-commitment transaction, then check out my 
-[HTLC deep-dive post][htlc-deep-dive-post]. I also recommend re-capping the post 
-on how channels are [opened][open-chans-post].
+Here are a few links that cover some preliminaries that might be useful for 
+understanding this blog post:
+
+- Why channel peers have an asymmetric state and how they go about updating this
+  state in a trust-less way: [Updating State][update-stat-post].
+- What HTLC outputs look like on a commitment transaction: [HTLC 
+  deep-dive][htlc-deep-dive-post]
+- How two nodes go about opening a channel: [Opening and announcing a 
+  pre-taproot LN channel][open-chans-post].
 
 # Normal Channel Operation
 
@@ -67,7 +70,7 @@ follows:
 
 ![](/normalChanOp/state-2.png#center)
 
-A red coloured commitment transaction, as shown below, represents past, revoked,
+A red coloured commitment transaction, as shown below, represents past, revoked
 commitment transactions. If Alice or Bob were to sign and broadcast one of their
 older revoked commitment transactions then the other side would be able to sweep
 all their funds. So these revoked transactions can effectively be considered
@@ -77,9 +80,10 @@ broadcast in a force close. Then finally, each side has what can be thought of
 as a “staging area” where changes to the commitment transaction can be proposed.
 Later on, either side can decide when it wants its counterparty to commit the
 changes in the staging commitment. For those of you who love a good analogy -
-this is very much like a git workflow: past commits are out of date, your latest
-committed changes represents the current state of your project and any changes
-that are not yet committed are in staging.
+this is very much like a git workflow: past commits are out of date, but they 
+tell a nice story of what has happened, your latest committed changes represent 
+the current state of your project and any changes that are not yet committed are 
+in staging.
 
 ![](/normalChanOp/state-3.png#center)
 
@@ -207,8 +211,8 @@ Let’s clean up the diagram a bit…
 
 That’s better.
 
-From the above diagram, notice that Alice and Bob’s latest commitment
-transaction are actually out of sync. This is fine since none of the updates
+From the above diagram, notice that Alice's and Bob’s latest commitment
+transactions are actually out of sync. This is fine since none of the updates
 have been irrevocably committed yet. That might seem hard to believe since the 
 commitment transactions look so different so let’s walk through the consequences 
 of either of these transactions ending up on-chain from the perspective of both 
@@ -216,7 +220,7 @@ sides.
 
 - From Alice’s perspective:
     - if her commitment transaction is broadcast, she gets back her original
-      `to_local` amount back.
+      `to_local` amount.
     - if Bob’s commitment transaction is broadcast:
         - For HTLCs `A1` and `A2`, Alice sent sats out meaning that her 
           `to_local` would be lower. But, if Bob was a router node for these 
@@ -229,7 +233,7 @@ sides.
           the incoming HTLCs from their incoming channel and would thus have 
           earned routing fees.
         - For HTLC `B1`, if Alice was a routing node for this HTLC, she would
-          not have forwarded it on yet and so would not stand to lose money here
+          not have forwarded it on yet and so would not stand to lose sats here
           if she is not able to claim the pre-image path. Alice’s `to_remote` 
           output would not be affected by this HTLC.
 
@@ -265,8 +269,8 @@ this point sends yet another HTLC, `A3`, to Bob:
 
 ### :gear: Step 7: Bob -> Alice: `commitment_signed`
 
-Bob wants to be put out of his misery and wants to irrevocably commit some of
-the HTLCs, so he finally sends Alice a `commitment_signed` of his own. This will
+Bob wants to irrevocably commit some of the HTLCs so that he can forward them 
+on, so he finally sends Alice a `commitment_signed` of his own. This will
 include his signature for Alice’s staging-area commitment transaction along with
 all the signatures required from him for the second-level HTLC outputs.
 
@@ -274,7 +278,7 @@ all the signatures required from him for the second-level HTLC outputs.
 
 ### :gear: Step 8: Alice -> Bob: `revoke_and_ack`
 
-Just like Bob did previously, Alice response to the `commitment_signed` with
+Just like Bob did previously, Alice responds to the `commitment_signed` with
 a `revoke_and_ack` in order to revoke her previous state:
 
 ![](/normalChanOp/state-12.png#center)
@@ -308,7 +312,7 @@ them!
 ### :gear: Step 9: Bob -> Alice: `update_fulfill_htlc(A2)`
 
 In the best case scenario, an HTLC is removed because it is being fulfilled
-meaning that it’s pre-image is being passed back. This is done with the 
+meaning that its pre-image is being passed back. This is done with the 
 `update_fulfilled_htlc` message which looks as follows:
 
 ![](/normalChanOp/update_fulfill_htlc.png#center)
@@ -325,15 +329,16 @@ send the pre-image upstream in order to claim any HTLCs there.
 
 ### :gear: Step 10: Bob -> Alice: `update_fail_htlc(A1)`
 
-HTLCs can also be removed due to failure with the `update_fail_htlc` message
+HTLCs can also be removed due to payment failures such as HTLCs timing out or if
+there was some sort of routing failure such as a specific channel on the path 
+no longer existing, a hop’s fee requirements not being met, a link not having 
+sufficient balance etc. Such failures are communicated with the 
+`update_fail_htlc` message
 
 ![](/normalChanOp/update_fail_htlc.png#center)
 
 The `reason` field is an encrypted blob for the sender of the payment in order
-to inform them of the failure reason. The failure reason will either be that the
-HTLC has timed out or that there was some sort of routing failure such as a
-specific channel on the path no longer existing, a hop’s fee requirements not
-being met, a link not having sufficient balance etc.
+to inform them of the failure reason.
 
 After Bob sends Alice the `update_fail_htlc` message for `A1`, the state looks
 as follows:
@@ -384,13 +389,15 @@ the `update_fee` message. This message is used to update the fee-rate that the
 peers should use when constructing their commitment transactions. The original
 fee-rate is decided in the open-channel flow but if the average mempool fee-rate
 increases, the channel funder might decide to update the fee of the commitment
-transactions so that they have a better chance of getting confirmed fast in a
-force close situation. It could also be that when the channel was opened, a very
-high fee-rate was chosen and perhaps a lower fee-rate would be desired.
+transactions so that they have a better chance of getting confirmed in a timely
+manner in a force close situation. It could also be that when the channel was 
+opened, a very high fee-rate was chosen and perhaps a lower fee-rate would be 
+desired.
 
-This message follow similar rules to other `update_*` messages in that it must
-also be committed to before it takes effect. The only other extra rule that
-applies to this message is that only the channel funder may send this message.
+This message follows similar rules to other `update_*` messages in that it must
+also be irrevocably committed before it takes effect. The only other extra rule 
+that applies to this message is that only the channel funder may send this 
+message.
 
 ![](/normalChanOp/update_fee.png#center)
 
@@ -431,10 +438,10 @@ from the peer which will give the peer an idea of the state it has definitely
 revoked. `my_current_per_commitment_point` is the commitment point of the local
 party on its last signed commitment transaction (in other words, the
 commitment transaction that has not yet been revoked). There are a lot of checks 
-that a node should do when receiving a channel_reestablish in order to make sure 
-that they are not tricked into revoking a state that should not yet be revoked 
-or tricked into broadcasting a state that _has_ been revoked. If you are 
-interested in the details around these checks, see 
+that a node should do when receiving a `channel_reestablish` in order to make 
+sure that they are not tricked into revoking a state that should not yet be 
+revoked or tricked into broadcasting a state that _has_ been revoked. If you are 
+interested in the details around these checks, see
 [bolt 2][bolt-2-retransmission].
 
 Note that when a connection re-establish happens, both sides must remove any
@@ -470,16 +477,17 @@ details in to the state diagram:
 
 ![](/normalChanOp/state-1.png#center)
 
-Once all the HTLCs have been cleared, they can start negotiating a fee to use
-for the final closing transaction. The funder of the channel must start this
-negotiation. Let’s assume that the funder of this channel was Alice.
+Once all the HTLCs have been cleared, which in our example is already the case, 
+they can start negotiating a fee to use for the final closing transaction. The 
+funder of the channel must start this negotiation. Let’s assume that the funder 
+of this channel was Alice.
 
 ### :gear: Step 18: Alice -> Bob: `closing_signed`
 
 Alice will first choose a fee-rate that she thinks is appropriate for the
 closing transaction. She will then use that fee-rate to complete the
-construction of the closing transaction and will sign it. She then sends
-the `closing_signed` message to Bob:
+construction of the closing transaction and will sign it. She then sends the 
+`closing_signed` message to Bob:
 
 ![](/normalChanOp/closing_signed.png#center)
 
@@ -497,13 +505,13 @@ At this point, the channel state looks as follows:
 
 There are two valid commitment transactions that can be signed at any time by
 each party to perform a force close, and there is one closing transaction
-proposal that uses a fee-rate of `x` sats per byte. This closing transaction
+proposal that uses a fee-rate of `x` sats-per-byte. This closing transaction
 currently only has Alice’s signature and so is not yet valid.
 
 ### :gear: Step 19: Bob -> Alice: `closing_signed`
 
 Bob may decide that the fee rate that Alice used is too low. So he sends a
-counterproposal with a new fee rate, `y` sats per byte` along with his
+counterproposal with a new fee rate, `y` sats-per-byte along with his
 signature for this counterproposal.
 
 ![](/normalChanOp/state-23.png#center)
@@ -534,6 +542,9 @@ HTLCs back and forth throughout the lifetime of the channel and in the end, all
 that showed up on-chain was the opening and closing transaction.
 
 Alice and Bob lived happily ever after.
+
+Thanks for reading! As always, if anything is unclear or incorrect, feel free
+to leave a comment down below. 
 
 [open-chans-post]: ../../posts/open_channel_pre_taproot
 [tap-chan-txs]: ../../posts/taproot-chan-txs
