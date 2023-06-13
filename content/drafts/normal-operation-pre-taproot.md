@@ -475,15 +475,16 @@ force-close transaction if required.
 ## Message Retransmission
 
 Something that you may have picked up on while walking through the add/remove
-HTLC flow is that there are no explicit acknowledgements for the `update_*`
-messages. That is ok most of the time since we assume that the underlying
-transport between the two nodes (see [Bolt 8][bolt-8]) is ordered and reliable.
-However, if the connection needs to be re-established for some reason, there
-will be doubt regarding whether our peer has received the last message that we
-sent. This is where the `channel_reestablish` message comes in. Upon
-reconnection, before continuing with the normal operation flow, the peers will
-exchange this message to make sure they are on the same page and to determine
-which messages they possibly need to re-send to their peer.
+HTLC flow is that explicit acknowledgements for the `update_*` messages is 
+delayed until the `commitment_signed`/`revoke_and_ack` exchange. That is ok 
+most of the time since we assume that the underlying transport between the two 
+nodes (see [Bolt 8][bolt-8]) is ordered and reliable. However, if the connection 
+needs to be re-established for some reason, there will be doubt regarding 
+whether our peer has received the last message that we sent. This is where the 
+`channel_reestablish` message comes in. Upon reconnection, before continuing with 
+the normal operation flow, the peers will exchange this message to make sure 
+they are on the same page and to determine which messages they possibly need to 
+re-send to their peer.
 
 ![](/normalChanOp/channel_reestablish.png#center)
 
