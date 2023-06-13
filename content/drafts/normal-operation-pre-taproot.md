@@ -544,7 +544,7 @@ Since the closing transaction will spend from the funding transaction and
 explicitly looks different from the commitment transactions, I’ll re-introduce 
 some of the details in to the state diagram:
 
-![](/normalChanOp/state-1.png#center)
+![](/normalChanOp/1-initial.png#center)
 
 Once all the HTLCs have been cleared, which in our example is already the case,
 they can start negotiating a fee to use for the final closing transaction. The
@@ -570,7 +570,7 @@ minimum and maximum values.
 
 At this point, the channel state looks as follows:
 
-![](/normalChanOp/state-22.png#center)
+![](/normalChanOp/32-closing-alice-prop.png#center)
 
 There are two valid commitment transactions that can be signed at any time by
 each party to perform a force close, and there is one closing transaction
@@ -583,7 +583,7 @@ Bob may decide that the fee rate that Alice used is too low. So he sends a
 counterproposal with a new fee rate, `y` sats-per-byte along with his
 signature for this counterproposal.
 
-![](/normalChanOp/state-23.png#center)
+![](/normalChanOp/33-closing-bob-prop.png#center)
 
 ### :gear: Step 20: Alice -> Bob: `closing_signed`
 
@@ -593,13 +593,13 @@ set to `y` sats-per-byte along with her signature for the transaction. Both
 parties will now have both signature required in order to broadcast the final
 closing transaction that uses the `y` sats-per-byte fee rate.
 
-![](/normalChanOp/state-24.png#center)
+![](/normalChanOp/34-closing-alice-agree.png#center)
 
 Either or both parties may now broadcast the closing transaction to the Bitcoin
 network. Eventually it will be confirmed, and the channel will officially be
 closed.
 
-![](/normalChanOp/state-25.png#center)
+![](/normalChanOp/35-closed.png#center)
 
 If this channel was a public channel, then any node in the network that had this
 channel in their routing graph will be able to see that the channel’s funding
