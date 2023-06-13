@@ -261,7 +261,7 @@ longer send any new <code>upate_add_htlc</code> messages. Alice and Bob now need
 until all remaining HTLCs have been cleared from both commitment transactions.
 Since the closing transaction will spend from the funding transaction and
 explicitly looks different from the commitment transactions, I’ll re-introduce
-some of the details in to the state diagram:</p><p><img loading=lazy src=/normalChanOp/state-1.png#center alt></p><p>Once all the HTLCs have been cleared, which in our example is already the case,
+some of the details in to the state diagram:</p><p><img loading=lazy src=/normalChanOp/1-initial.png#center alt></p><p>Once all the HTLCs have been cleared, which in our example is already the case,
 they can start negotiating a fee to use for the final closing transaction. The
 funder of the channel must start this negotiation. Let’s assume that the funder
 of this channel was Alice.</p><h3 id=-step-18-alice---bob-closing_signed>⚙️ Step 18: Alice -> Bob: <code>closing_signed</code><a hidden class=anchor aria-hidden=true href=#-step-18-alice---bob-closing_signed>#</a></h3><p>Alice will first choose a fee-rate that she thinks is appropriate for the
@@ -273,18 +273,18 @@ signature for this proposal. She may optionally also include
 the <code>min_fee_satoshis</code> and <code>max_fee_satoshis</code> fields in order to let Bob know
 that if he disagrees with her proposed <code>fee_satoshis</code>, then he may send a
 counterproposal as long as his counterproposal lies between the provided
-minimum and maximum values.</p><p>At this point, the channel state looks as follows:</p><p><img loading=lazy src=/normalChanOp/state-22.png#center alt></p><p>There are two valid commitment transactions that can be signed at any time by
+minimum and maximum values.</p><p>At this point, the channel state looks as follows:</p><p><img loading=lazy src=/normalChanOp/32-closing-alice-prop.png#center alt></p><p>There are two valid commitment transactions that can be signed at any time by
 each party to perform a force close, and there is one closing transaction
 proposal that uses a fee-rate of <code>x</code> sats-per-byte. This closing transaction
 currently only has Alice’s signature and so is not yet valid.</p><h3 id=-step-19-bob---alice-closing_signed>⚙️ Step 19: Bob -> Alice: <code>closing_signed</code><a hidden class=anchor aria-hidden=true href=#-step-19-bob---alice-closing_signed>#</a></h3><p>Bob may decide that the fee rate that Alice used is too low. So he sends a
 counterproposal with a new fee rate, <code>y</code> sats-per-byte along with his
-signature for this counterproposal.</p><p><img loading=lazy src=/normalChanOp/state-23.png#center alt></p><h3 id=-step-20-alice---bob-closing_signed>⚙️ Step 20: Alice -> Bob: <code>closing_signed</code><a hidden class=anchor aria-hidden=true href=#-step-20-alice---bob-closing_signed>#</a></h3><p>If Alice is happy with Bob’s counterproposal, then she sends one
+signature for this counterproposal.</p><p><img loading=lazy src=/normalChanOp/33-closing-bob-prop.png#center alt></p><h3 id=-step-20-alice---bob-closing_signed>⚙️ Step 20: Alice -> Bob: <code>closing_signed</code><a hidden class=anchor aria-hidden=true href=#-step-20-alice---bob-closing_signed>#</a></h3><p>If Alice is happy with Bob’s counterproposal, then she sends one
 more <code>closing_signed</code> message to Bob but this time with the <code>fee_satoshis</code> field
 set to <code>y</code> sats-per-byte along with her signature for the transaction. Both
 parties will now have both signature required in order to broadcast the final
-closing transaction that uses the <code>y</code> sats-per-byte fee rate.</p><p><img loading=lazy src=/normalChanOp/state-24.png#center alt></p><p>Either or both parties may now broadcast the closing transaction to the Bitcoin
+closing transaction that uses the <code>y</code> sats-per-byte fee rate.</p><p><img loading=lazy src=/normalChanOp/34-closing-alice-agree.png#center alt></p><p>Either or both parties may now broadcast the closing transaction to the Bitcoin
 network. Eventually it will be confirmed, and the channel will officially be
-closed.</p><p><img loading=lazy src=/normalChanOp/state-25.png#center alt></p><p>If this channel was a public channel, then any node in the network that had this
+closed.</p><p><img loading=lazy src=/normalChanOp/35-closed.png#center alt></p><p>If this channel was a public channel, then any node in the network that had this
 channel in their routing graph will be able to see that the channel’s funding
 output has not been spent and so will remove the channel from their graph at
 this point.</p><p>The beauty of the channel is that Alice and Bob could have sent millions of
