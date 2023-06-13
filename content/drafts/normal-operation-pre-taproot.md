@@ -64,8 +64,8 @@ time and broadcasting it to the Bitcoin network. This would be a force close.
 
 For the sake of making the next few diagrams in this article a bit simpler, I
 am going to ignore the funding transaction along with the `to_local` and
-`to_remote` outputs for a while since our focus is going to be on adding and
-removing HTLC outputs. So the above diagram can instead be represented as
+`to_remote` outputs for a while since our initial focus is going to be on adding
+and removing HTLC outputs. So the above diagram can instead be represented as
 follows:
 
 ![](/normalChanOp/2-simplified.png#center)
