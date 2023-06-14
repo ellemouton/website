@@ -7,15 +7,14 @@ cover:
     image: "/normalChanOp/cover.png"
 ---
 
-I’ve [previously written][open-chans-post] in depth about how pre-Taproot
-Lightning channels are opened, but I’ve never gone into the details of the
-normal operations and closures of pre-Taproot channels. Since I promised in my
-[previous post][tap-chan-txs] about Taproot channel transactions that I would
-write a follow-up explaining how all the channel messages need to be updated in
-order to support the new MuSig2 signing required by Taproot channels, I think
-now is the time to finally dive into the normal channel operations and closures
-so that the follow-up post on how Taproot channels affect these operations is
-easier to parse.
+I’ve [previously written][open-chans-post] in depth about how Lightning channels
+are opened, but I’ve never gone into the details of the normal operations and 
+closures of channels. Since I promised in my [previous post][tap-chan-txs] about 
+Taproot channel transactions that I would write a follow-up explaining how all 
+the channel messages need to be updated in order to support the new MuSig2 
+signing required by Taproot channels, I think now is the time to finally dive 
+into the normal channel operations and closures so that the follow-up post on 
+how Taproot channels affect these operations is easier to parse. 
 
 # Overview
 
@@ -23,8 +22,9 @@ In this blog post, I will talk about the normal operations of a channel. This
 involves understanding how HTLCs are added to a channel and how channel peers
 commit to a new state including these HTLCs. Then I will cover how a channel’s
 normal flow is re-established after a disconnection and finally, the cooperative
-channel closure flow will be covered. I plan on doing all of this with a
-long-running example.
+channel closure flow will be covered. All of these topics are covered in 
+[Bolt 2][bolt-2], but I thought a diagram or two could help with understanding. 
+I plan on doing all of this with a long-running example.
 
 # Preliminaries
 
@@ -60,7 +60,7 @@ represented by the green box (“Alice is green” doesn’t have quite the same
 to it). Each commitment transaction also has the `to_local` and `to_remote`
 outputs which pay the respective parties their current channel balance. Both
 Alice and Bob have the ability to sign their own commitment transaction at any
-time and broadcasting it to the Bitcoin network. This would be a force close.
+time and broadcast it to the Bitcoin network. This would be a force close.
 
 For the sake of making the next few diagrams in this article a bit simpler, I
 am going to ignore the funding transaction along with the `to_local` and
@@ -245,45 +245,28 @@ sides.
 - From Alice’s perspective:
   - if her commitment transaction is broadcast, she gets back her original
     `to_local` amount.
-  - if Bob’s commitment transaction is broadcast:
-    - For HTLCs that Alice offered (such as `A1` and `A2`), Alice is sending 
-      sats _out_ meaning that her `to_local` would be lower. But, if Bob was 
-      a router node for these HTLCs then he would not have forwarded them as 
-      they are not yet irrevocably committed meaning that he won't receive the 
-      pre-images required to claim these HTLCs and Alice would be able to get 
-      her funds back via the timeout path. If Bob was the recipient of these 
-      HTLCs, then he would be able to produce the pre-image to claim the HTLCs, 
-      but then Alice would see the pre-image on-chain and would be able to claim
-      the incoming HTLCs from their incoming channel and would thus have earned 
-      routing fees.
-    - For HTLCs offered to Alice (there are currently none in our example) on 
-      Bob's commitment transaction, Alice's output on Bob's commitment 
-      transaction (the `to_remote`) would not be affected. If she was a routing 
-      node for the HTLC then she would have not forwarded it on yet due to it 
-      not being irrevocably committed and so would not stand to lose sats here 
-      if she is un-able to claim the pre-image path. 
+  - if Bob’s commitment transaction is broadcast, then Alice's offered HTLCs 
+    (such as `A1` and `A2`) will be on-chain. For offered HTLCs, Alice is 
+    sending sats _out_ meaning that her `to_local` would be lower. But, if 
+    Bob was a router node for these HTLCs then he would not have forwarded 
+    them as they are not yet irrevocably committed meaning that he won't 
+    receive the pre-images required to claim these HTLCs and Alice would be 
+    able to get her funds back via the timeout path. If Bob was the recipient 
+    of these HTLCs, then he would be able to produce the pre-image to claim 
+    the HTLCs, but then Alice would see the pre-image on-chain and would be 
+    able to claim the incoming HTLCs from their incoming channel and would 
+    thus have earned routing fees. 
 
 - From Bob’s perspective (very similar to the logic for Alice):
   - if Alice’s commitment transaction is broadcast, Bob gets back his funds via 
     the `to_remote` output.
-  - If Bob had to force close via his commitment transaction:
-    - For HTLCs offered to Bob (like `A1` and `A2`), if Bob was routing these, 
-      then he would not have forwarded them on since they are not yet 
-      irrevocably committed. He thus won't be able to claim the success path but 
-      that is fine since the funds for these did not come out of his balance. If
-      Bob was the final destination for these, then he would be able to claim
-      them via the success path.
-    - For an HTLC offered by Bob (there are currently none of these in our 
-      example), the value for this HTLC would come out of Bob’s
-      balance, so he definitely would want to get these funds back. If Alice
-      was a router node for this payment, then she would not have routed it
-      on since it was not yet irrevocably committed (meaning that she
-      could have lost funds if she routed it on) and so the pre-image for
-      this output won't be revealed by Alice and so Bob will eventually be
-      able to sweep via the timeout path. If Alice was the final destination
-      then she would reveal the pre-image and sweep the output but then Bob
-      would see the pre-image and would be able to claim the matching
-      incoming HTLC and so would earn routing fees for this payment.
+  - If Bob had to force close via his commitment transaction, then HTLCs offered
+    to him (like `A1` and `A2`) would be on-chain, if Bob was routing these, 
+    then he would not have forwarded them on since they are not yet irrevocably 
+    committed. He thus won't be able to claim the success path but that is fine 
+    since the funds for these did not come out of his balance. If Bob was the 
+    final destination for these, then he would be able to claim them via the 
+    success path. 
 
 ### :gear: Step 6: Alice -> Bob: `update_add_htlc(A3)`
 
@@ -526,7 +509,7 @@ an end. Closing a channel in a cooperative way requires the two peers to decide
 on a final closing transaction that will spend from the funding transaction and
 will pay each of them their final channel balance immediately.
 
-### :gear: Step 17: Bob -> Alice: `shutdown`
+### :gear: Step 22: Bob -> Alice: `shutdown`
 
 Bob has decided that it is time to cut ties and sends Alice the `shutdown`
 message.
@@ -538,7 +521,7 @@ channel balance to be sent to in the closing transaction. Once Bob has sent this
 message, he may no longer send any new `update_add_htlc` messages. He may only
 send HTLC removal and `update_fee` messages. When Alice receives this message
 from Bob, she must respond with her own `shutdown` message and may also no 
-longer send any new `upate_add_htlc` messages. Alice and Bob now need to wait 
+longer send any new `update_add_htlc` messages. Alice and Bob now need to wait 
 until all remaining HTLCs have been cleared from both commitment transactions. 
 Since the closing transaction will spend from the funding transaction and 
 explicitly looks different from the commitment transactions, I’ll re-introduce 
@@ -551,7 +534,7 @@ they can start negotiating a fee to use for the final closing transaction. The
 funder of the channel must start this negotiation. Let’s assume that the funder
 of this channel was Alice.
 
-### :gear: Step 18: Alice -> Bob: `closing_signed`
+### :gear: Step 23: Alice -> Bob: `closing_signed`
 
 Alice will first choose a fee-rate that she thinks is appropriate for the
 closing transaction. She will then use that fee-rate to complete the
@@ -560,11 +543,11 @@ construction of the closing transaction and will sign it. She then sends the
 
 ![](/normalChanOp/closing_signed.png#center)
 
-The `fee_satoshis` field tells Bob the fee-rate that Alice used to construct the
-first closing transaction proposal and the `signature` contains Alice’s
-signature for this proposal. She may optionally also include
-the `min_fee_satoshis` and `max_fee_satoshis` fields in order to let Bob know
-that if he disagrees with her proposed `fee_satoshis`, then he may send a
+The `fee_satoshis` field tells Bob the fee in satoshis that Alice used to 
+construct the first closing transaction proposal and the `signature` contains 
+Alice’s signature for this proposal. She may optionally also include the 
+`min_fee_satoshis` and `max_fee_satoshis` fields in order to let Bob know that 
+if he disagrees with her proposed `fee_satoshis`, then he may send a
 counterproposal as long as his counterproposal lies between the provided
 minimum and maximum values.
 
@@ -575,23 +558,30 @@ At this point, the channel state looks as follows:
 There are two valid commitment transactions that can be signed at any time by
 each party to perform a force close, and there is one closing transaction
 proposal that uses a fee-rate of `x` sats-per-byte. This closing transaction
-currently only has Alice’s signature and so is not yet valid.
+currently only has Alice’s signature and so is not yet valid. 
 
-### :gear: Step 19: Bob -> Alice: `closing_signed`
+If at this point, Bob is happy with Alice's proposal, he could go ahead and 
+sign the closing transaction using the fee-rate proposed by Alice and could 
+broadcast it and that would be the end of it. But for the sake of the example, 
+let's say that Bob isn't quite happy yet. 
+
+### :gear: Step 24: Bob -> Alice: `closing_signed`
 
 Bob may decide that the fee rate that Alice used is too low. So he sends a
-counterproposal with a new fee rate, `y` sats-per-byte along with his
+counterproposal with a new fee rate, `y` sats-per-byte, along with his
 signature for this counterproposal.
 
 ![](/normalChanOp/33-closing-bob-prop.png#center)
 
-### :gear: Step 20: Alice -> Bob: `closing_signed`
+### :gear: Step 25: Alice -> Bob: `closing_signed`
 
-If Alice is happy with Bob’s counterproposal, then she sends one
-more `closing_signed` message to Bob but this time with the `fee_satoshis` field
-set to `y` sats-per-byte along with her signature for the transaction. Both
-parties will now have both signature required in order to broadcast the final
-closing transaction that uses the `y` sats-per-byte fee rate.
+If Alice is happy with Bob’s counterproposal, then she signs the closing 
+transaction using the fee-rate suggested by Bob. She may then broadcast the 
+transaction and call it a day. However, it is recommended in the spec that 
+Alice send one more `closing_signed` message to Bob but this time with the 
+`fee_satoshis` field set to `y` sats-per-byte along with her signature for the 
+transaction. Both parties will now have both signature required in order to 
+broadcast the final closing transaction that uses the `y` sats-per-byte fee rate.
 
 ![](/normalChanOp/34-closing-alice-agree.png#center)
 
@@ -621,4 +611,5 @@ to leave a comment down below.
 [htlc-deep-dive-post]: ../../posts/htlc-deep-dive
 [revocation-post]: ../../posts/revocation
 [bolt-8]: https://github.com/lightning/bolts/blob/master/08-transport.md
+[bolt-2]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md
 [bolt-2-retransmission]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#message-retransmission
