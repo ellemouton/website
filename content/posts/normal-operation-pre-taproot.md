@@ -1,7 +1,7 @@
 ---
 title: "Normal operation and closure of a pre-taproot LN channel"
 summary: "A deep-dive into the normal operation and closure of a pre-taproot Lightning Network channel"
-date: 2023-06-13
+date: 2023-06-14
 
 cover:
     image: "/normalChanOp/cover.png"
