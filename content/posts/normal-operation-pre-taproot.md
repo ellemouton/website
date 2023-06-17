@@ -593,8 +593,8 @@ closed.
 
 If this channel was a public channel, then any node in the network that had this
 channel in their routing graph will be able to see that the channel’s funding
-output has not been spent and so will remove the channel from their graph at
-this point.
+output has been spent and so will remove the channel from their graph at this 
+point.
 
 The beauty of the channel is that Alice and Bob could have sent millions of
 HTLCs back and forth throughout the lifetime of the channel and in the end, all
