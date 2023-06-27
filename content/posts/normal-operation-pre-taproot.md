@@ -293,7 +293,7 @@ a `revoke_and_ack` in order to revoke her previous state. This also serves as
 an acknowledgement to Bob that Alice has received and committed to `B1` and so 
 Bob can now add `B1` to his staging area commitment transaction.
 
-![](/normalChanOp/12-revoke_and_ack_2.png#center)
+![](/normalChanOp/12-revoke_2.png#center)
 
 Allow me to clean that up real quick…
 
