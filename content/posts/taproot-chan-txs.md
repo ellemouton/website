@@ -98,7 +98,7 @@ Notice that unlike in pre-taproot channels where spending from the funding
 output would require two signatures created completely independently of each
 other, in Taproot channels, the signatures are created in an interactive manner
 between the peers. I will cover the details of how exactly this affects the
-interaction between the peers in the next blog post.
+interaction between the peers in a future blog post. 
 
 # Commitment Transaction Outputs
 
@@ -367,9 +367,9 @@ the `to_local` output.
 
 If you have made it all the way through that, congrats! You should now have a 
 pretty solid understanding of the structure of Taproot channel commitment 
-transactions. My next blog post will cover how the various channel peer messages
-will need to be updated to support MuSig2 signing. I expect it to be a short and 
-sweet one.
+transactions. A future blog post will cover how the various channel peer 
+messages will need to be updated to support MuSig2 signing. I expect it to be a 
+short and sweet one.
 
 As always, if you have any questions, comments or corrections, please feel free
 to leave a comment down below :) 
