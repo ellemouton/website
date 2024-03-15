@@ -301,4 +301,6 @@ policy rules for the channel.
 
 ![](/onion/14-invoice-hop-hint.png#center)
 
+The rest of the path finding process is the same :)
+
 [chan-open-post]: ../../posts/open_channel_pre_taproot
