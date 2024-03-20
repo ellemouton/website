@@ -6,7 +6,7 @@ date: 2024-03-15
 ShowToc: true
 
 cover:
-    image: "/onion/cover.png"
+    image: "/onion_prelims/cover.png"
 ---
 
 # Overview
@@ -31,12 +31,12 @@ As per usual, I'll use a long-running example throughout the post.
 Meet Alice and Dave (don’t stress, Bob will appear later but today is Dave’s 
 time to shine) they are two nodes on the Lightning Network.
 
-![](/onion/1-alice-and-dave.png#center)
+![](/onion_prelims/1-alice-and-dave.png#center)
 
 Alice wants to pay Dave for a coffee and so Dave generates an Invoice and shows 
 it to Alice using a QR code.
 
-![](/onion/2-invoice.png#center)
+![](/onion_prelims/2-invoice.png#center)
 
 As you can see, the invoice has some useful information:
 
@@ -59,7 +59,7 @@ channel announcements in order to construct a local graph of the network so now
 all she has to do is find Dave in that network and then find paths (via 
 channels) that lead to Dave’s node.
 
-![](/onion/3-graph.png#center)
+![](/onion_prelims/3-graph.png#center)
 
 The diagram above shows Alice’s view of the network along with Dave’s position 
 within the network. Apart from the node and channel announcements that Alice 
@@ -81,7 +81,7 @@ contains the following info:
 Here is the updated version of Alice’s graph view showing the `channel_update`
 information she has about each channel in her graph.
 
-![](/onion/4-chan-updates.png#center)
+![](/onion_prelims/4-chan-updates.png#center)
 
 If we narrow down on the current goal which is to pay Dave, we can simplify this 
 diagram quite a bit to only show the relevant data. We only care about the 
@@ -92,7 +92,7 @@ Charlie have advertised `channel_updates` referring to channel `BC`, but
 because Alice only cares about the direction from Bob to Charlie, she only 
 needs to look at the info from his `channel_update`.
 
-![](/onion/5-path-choices.png#center)
+![](/onion_prelims/5-path-choices.png#center)
 
 The above diagram shows the two potential paths from Alice to Bob:
 
@@ -176,14 +176,14 @@ Ie, the total that Alice will pay in fees is:
 
 Aaaand the winner is: Path 1! Now we only need care about the following info:
 
-![](/onion/6-path1.png#center)
+![](/onion_prelims/6-path1.png#center)
 
 # Hop Payloads
 
 Alice now has enough info to know what she wants to communicate to each hop 
 along the path.
 
-![](/onion/7-last-hop-info.png#center)
+![](/onion_prelims/7-last-hop-info.png#center)
 
 Alice wants Dave to receive an `update_add_htlc` from Charlie on the `CD` 
 channel. The `payment_hash` should match the one specified in the invoice 
@@ -196,7 +196,7 @@ Using the fee calculation we did earlier for this path, Alice can also determine
 what the `update_add_htlc`s should look like for the Bob-to-Charlie and 
 Alice-to-Bob steps.
 
-![](/onion/8-other-hop-info.png#center)
+![](/onion_prelims/8-other-hop-info.png#center)
 
 The only part of the puzzle that is missing here is: How does Alice tell 
 Charlie what to forward to Dave if she is only connected to Bob? This is where 
@@ -204,7 +204,7 @@ the `onion_routing_packet` field in `update_add_htlc` comes in. Alice packages
 up what she wants to tell each node and essentially then wraps it with the 
 payload for the previous node. The diagram below should make this more clear:
 
-![](/onion/9-onion-info.png#center)
+![](/onion_prelims/9-onion-info.png#center)
 
 So Bob gets the info for him from Alice but also a packet that he should forward 
 to Charlie. Charlie gets this packet and reads the data meant for him and sees 
@@ -224,7 +224,7 @@ actually look.
 Ok so Alice knows what she wants to tell each of the hops. This is called the 
 “payload” the hop. She puts together the following packet for Bob:
 
-![](/onion/10-naive-bob-pkt.png#center)
+![](/onion_prelims/10-naive-bob-pkt.png#center)
 
 The packet has the following components:
 - 1 byte packet version byte
@@ -241,7 +241,7 @@ Bob will receive this packet and will do the following:
    append the HMAC given to him by Alice for this packet since he cannot produce 
    this HMAC himself.
 
-![](/onion/11-naive-charlie-pkt.png#center)
+![](/onion_prelims/11-naive-charlie-pkt.png#center)
 
 Charlie will receive this packet and do the following:
 
@@ -249,7 +249,7 @@ Charlie will receive this packet and do the following:
 2. He will read the payload meant for him along with the HMAC
 3. He will reconstruct the packet that should be passed on to Dave:
 
-![](/onion/12-naive-dave-pkt.png#center)
+![](/onion_prelims/12-naive-dave-pkt.png#center)
 
 Dave will receive this packet and do the following:
 1. He will check that the HMAC is valid
@@ -289,7 +289,7 @@ actually doesn’t know about the channel between Charlie and Dave (Channel
 `CD`). This is because it might be a private channel that Charlie and Dave 
 chose not to announce to the network.
 
-![](/onion/13-graph-private-hop.png#center)
+![](/onion_prelims/13-graph-private-hop.png#center)
 
 In this case, Alice will not be able to find a path to Dave’s node unless he 
 provides her with more information in the invoice he sends her. The extra info 
@@ -299,7 +299,7 @@ make up for any info that Alice would have received from a
 includes Charlie’s public key, the SCID of the channel and then all the routing 
 policy rules for the channel.
 
-![](/onion/14-invoice-hop-hint.png#center)
+![](/onion_prelims/14-invoice-hop-hint.png#center)
 
 The rest of the path finding process is the same :)
 
