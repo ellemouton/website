@@ -11,12 +11,12 @@ cover:
 
 # Overview
 
-In this post, we get back to basics. It will cover the preliminaries you need to
+In this post, we get back to basics. It covers the preliminaries you need to
 be aware of for pathfinding, and it also sets the scene for Sphinx packet 
-construction which will be covered in a follow-up post. Specifically, we answer
-some basic questions such as: "For a node making a payment, how do I find a 
-path to the destination node? And how do I communicate to each node on the path 
-what it should do?"
+construction which will be covered in a [follow-up post][sphinx]. Specifically, 
+we answer some basic questions such as: "For a node making a payment, how do I 
+find a path to the destination node? And how do I communicate to each node on 
+the path what it should do?"
 
 By the end of this post, you should understand what information the sender
 needs in order to construct a path, what information it must communicate to each
@@ -65,18 +65,18 @@ The diagram above shows Alice’s view of the network along with Dave’s positi
 within the network. Apart from the node and channel announcements that Alice 
 has received, she would also have received `channel_update` messages from all 
 these nodes for each of the channels that they own. The `channel_update` 
-messages contain info about the relay policy that that node will enforce if 
-other nodes wish to route payments over its channel. Each `channel_update` 
+messages contain information about the relay policy that that node will enforce 
+if other nodes wish to route payments over its channel. Each `channel_update` 
 contains the following info:
 
 - `channel_ID`: This identifies the channel that the update is referring to.
 - `fee_base_msat`: This is the fee (in milli-satoshis) that the node will 
    charge for routing any payment regardless of the size of the payment.
 - `fee_proportional_millionths`: Also known as the “fee rate”, this is the 
-   number of satoshis that will be charged for every million satoshis you want 
-   to route across that channel.
+   number of satoshis that will be charged for every million satoshis routed 
+   across that channel.
 - `cltv_expiry_delta`: This is the delta between the incoming HTLC’s CLTV and 
-   outgoing HTLC’s CLTV that the node requires.
+   outgoing HTLC’s CLTV that the node requires (more on this later). 
 
 Here is the updated version of Alice’s graph view showing the `channel_update`
 information she has about each channel in her graph.
@@ -90,7 +90,7 @@ about the `channel_update` from nodes where we will potentially be sending
 across their channel in the outbound direction. For example: Both Bob and 
 Charlie have advertised `channel_updates` referring to channel `BC`, but 
 because Alice only cares about the direction from Bob to Charlie, she only 
-needs to look at the info from his `channel_update`.
+needs to look at the information from his `channel_update`.
 
 ![](/onion_prelims/5-path-choices.png#center)
 
@@ -110,9 +110,9 @@ cost-effective for her.
 To work out the total fees for a path, we have to work backwards from the 
 destination.
 
-- We know that Dave should be paid 4999999 msats which means that this is the 
-  number of sats routed through Charlie. So the amount of fees to pay to Charlie
-  can be calculated as follows:
+- We know that Dave should be paid 4999999 msats (he said so in his invoice) 
+  which means that this is the number of sats routed through Charlie. So the 
+  amount of fees to pay to Charlie can be calculated as follows:
 
 ```
  = Charlie’s Base Fee + Charlie’s proportional fee in parts per million/1000000 * (The amount routed through Charlie)
@@ -180,8 +180,8 @@ Aaaand the winner is: Path 1! Now we only need care about the following info:
 
 # Hop Payloads
 
-Alice now has enough info to know what she wants to communicate to each hop 
-along the path.
+Alice now has enough information to know what she wants to communicate to each 
+hop along the path.
 
 ![](/onion_prelims/7-last-hop-info.png#center)
 
@@ -206,13 +206,13 @@ payload for the previous node. The diagram below should make this more clear:
 
 ![](/onion_prelims/9-onion-info.png#center)
 
-So Bob gets the info for him from Alice but also a packet that he should forward 
-to Charlie. Charlie gets this packet and reads the data meant for him and sees 
-that there is also a payload that he should forward on to Dave. Dave gets his 
-payload and sees that he is the final node in the path. At this point, Dave will 
-check if he has the pre-image for the incoming payment hash. Note that this is
-where the idea of the "onion" comes in: each hop gets a packet that they must 
-"peel" like an onion.
+So Bob gets the information for him from Alice but also a packet that he should 
+forward to Charlie. Charlie gets this packet and reads the data meant for him 
+and sees that there is also a payload that he should forward on to Dave. Dave 
+gets his payload and sees that he is the final node in the path. At this point, 
+Dave will check if he has the pre-image for the incoming payment hash. Note that 
+this is where the idea of the "onion" comes in: each hop gets a packet that they 
+must "peel" like an onion.
 
 # Naive Onion Packet Construction
 
@@ -278,6 +278,51 @@ construction! With Sphinx packet construction:
 
 I’ll see you in the next post for all the details on this!
 
+# A note on CLTV Deltas
+
+To understand why nodes advertise a CLTV delta and how this is used by the 
+sender of a payment to determine which CLTV to communicate to each hop, let’s 
+take a step back and just look at the structure of an HTLC:
+
+![](/onion_prelims/ctlv_delta_1.png#center)
+
+The diagram above shows the HTLC between Charlie and Dave (the last node on the
+path). An HTLC has two possible spending paths: The pre-image path which will 
+pay the funds to Dave if he is able to produce the pre-image corresponding to 
+the payment hash. The other path is the timeout path which will pay the funds 
+back to Charlie. This timeout path is only spendable after the block height 
+defined by `CLTV A`. Let’s assume that the current block height is 1001. If 
+`CLTV A` is 1002, then there is a real chance that just as Dave is about to 
+reveal the pre-image to Charlie, block 1002 gets mined and Charlie quickly goes 
+ahead and broadcasts the transaction and spends the timeout path before Dave is 
+able to sweep the pre-image path. To prevent this race, Dave will want some time 
+where he can confidently spend the pre-image path if he needs to before the 
+timelock path becomes spendable. He communicates his desired buffer, 9 blocks,  
+using the `min_final_cltv_expiry_delta` field of the invoice that he sends to 
+Alice. Alice then knows that if she where to send the payment right now while 
+the block height is 1001, that Dave will fail any incoming HTLC with a `CLTV A` 
+smaller than 1010.
+
+Now, let’s zoom out a bit more and include the HTLC between Bob and Charlie. We 
+want to now figure out what an appropriate value would be for the CLTV on the 
+HTLC between Bob and Charlie, `CLTV B`.
+
+![](/onion_prelims/cltv_delta_2.png#center)
+
+Let’s assume that Dave waits until the very last minute to reveal the pre-image 
+to Charlie. In other words, he waits until just before block 1010 is mined. 
+Charlie now needs to turn around and present this pre-image to Bob. In the case 
+that Bob goes on-chain with the HTLC, Charlie requires  some time where he can 
+spend the pre-image path without worrying about Bob being able to spend the 
+timeout path. This buffer that Charlie requires between receiving the pre-image 
+from Dave and being able to spend the pre-image path safely from the HTLC with 
+Bob is Charlie’s CLTV delta. He will advertise this value in his 
+`channel_update` and he expects Alice to use that value when constructing her 
+payment path. If a payment comes through to Bob and the difference between 
+`CLTV_B` and `CLTV_A` value  is less than the delta that he advertised, he will 
+fail the payment. He requires that `CLTV_B` be equal to at least `CLTV_A` plus 
+his advertised CLTV delta.
+
 # Bonus Section: Hop Hints
 
 This post is a good place to quickly cover what you need to know about hop 
@@ -292,9 +337,9 @@ chose not to announce to the network.
 ![](/onion_prelims/13-graph-private-hop.png#center)
 
 In this case, Alice will not be able to find a path to Dave’s node unless he 
-provides her with more information in the invoice he sends her. The extra info 
-that Dave may provide is made up of one or more “Hop Hints”. These hints need to 
-make up for any info that Alice would have received from a 
+provides her with more information in the invoice he sends her. The extra 
+information that Dave may provide is made up of one or more “Hop Hints”. These 
+hints need to make up for any information that Alice would have received from a 
 `channel_announcement` and `channel_update` for the channel. This information 
 includes Charlie’s public key, the SCID of the channel and then all the routing 
 policy rules for the channel.
@@ -304,3 +349,4 @@ policy rules for the channel.
 The rest of the path finding process is the same :)
 
 [chan-open-post]: ../../posts/open_channel_pre_taproot
+[sphinx]: ../../drafts/sphinx
