@@ -93,7 +93,40 @@ clear with the example.
 
 # XOR
 
-<TODO: do>
+The XOR (or Exclusive-OR) operation is a bitwise operation where the result is 
+1 if one _and only one_ of the two bits being operated on is 1. In other words, 
+the result of the XOR operation is only 1 if the two bits being operated on 
+differ. The XOR truth table can be seen below. It shows the result (`C`) after 
+performing the XOR operation on two bits, `A` and `B`, for each of the various 
+combinations.
+
+![](/onion/xor-1.png#center)
+
+The next diagram demonstrates an interesting property of XOR that we will be 
+making use of in the sphinx packet construction later in this post. It shows 
+that taking the result of the above operation, `C`, and XORing it with `A` 
+produces `B`. Similarly, the XOR of `C` and `B` produce `A`.
+
+![](/onion/xor-2.png#center)
+
+To really nail down the idea, let’s look at some examples: In example 1 below, 
+you can see that if you XOR a packet with itself then it produces a zero byte 
+array. So XORing something with itself essentially destroys information. 
+Example 2 shows that if you take a packet and XOR it with a zero byte array of 
+the same length, then it produces the original packet.
+
+![](/onion/xor-3.png#center)
+
+Ok let’s see some more useful and interesting examples:
+
+![](/onion/xor-4.png#center)
+
+Example 3 shows that if you take a packet and XOR it with a random byte stream, 
+then you get the encrypted form of the packet. Example 4 shows that if you then 
+take that encrypted packet and once again XOR it with the _same_ byte stream, 
+then you are once again left with the clear text. The sphinx packet 
+construction makes heavy use of XOR for using encrypting a clear text packet 
+using a psuedo random byte stream.
 
 # Sender preparation
 
@@ -347,9 +380,57 @@ that each HMAC that it is given is correct.
 
 # Errors
 
-<TODO: diagrams, text, everything:upside_down_face:>
+Compared to what we have already covered, understanding how errors are dealt 
+with should be a breeze :)
 
+Let’s assume that when Charlie decoded the payload in the onion sent from Alice, 
+he realises that she is asking him to forward an amount that would mean that he 
+does not get the fee that he has advertised. Charlie will then want to fail the 
+payment and so instead of passing the onion on to Dave, he instead constructs a 
+failure message packet which will contain a message he wishes to send back to 
+Alice telling her what went wrong. He may choose to pad this message too. He 
+will use the shared secret he has with Alice, $ss_{AC}$ along with the `um` 
+constant to produce an HMAC over the data. He will then use $ss_{AC}$ along with 
+the `ammag` constant to produce a pseudo random bytes stream which he will then
+XOR with the failure message packet. He will then put this encrypted message in 
+an `update_fail_htlc` message and send that back to Bob.
 
+![](/onion/errors-1.png#center)
+
+Bob will simply take his shared secret with Alice, $ss_{AB}$, produce another 
+byte stream and re-encrypt the payload as is. He, too, will put this into an 
+`update_fail_htlc` message and send it back to Alice.
+
+![](/onion/errors-2.png#center)
+
+When Alice receives this message, she does not immediately know which hop 
+produced the payload, but she does know in which order things would have been 
+encrypted. So she starts decrypting by un-peeling Bob’s encryption layer. Once 
+decrypted, she looks at the first 32 bytes of the payload (the size of an HMAC), 
+computes the HMAC for the rest of the payload and checks if those two HMACs are 
+equal. In this case, they will not be which means that Bob was not the erring 
+node.
+
+![](/onion/errors-3.png#center)
+
+She then continues by peeling back Charlie’s encryption layer and then repeats 
+the process of checking the HMAC. In this case, the HMACs will be equal and so 
+Alice knows that Charlie is the source of the error and so she can now read his 
+erring reason from the failure message.
+
+![](/onion/errors-4.png#center)
+
+### One little edge case
+
+One edge case to be aware of is where Charlie gets the onion packet from Bob but
+then is not able to successfully parse it. If Charlie cannot parse it, then he 
+won’t know the ephemeral key to use to derive the shared secret with Alice. This 
+means that he would not be able to encrypt a failure message packet. So in this 
+case, Charlie will send Bob an `update_fail_malformed_htlc` message with some 
+information about the type of error that occurred. When bob receives this, he 
+knows that he must do the initial encryption round for this error. He does this 
+and then sends the packet back to Alice in an `update_fail_htlc` message.
+ç
 # Conclusion
 
 Well if you are still here - congrats! You now understand the complexities 
