@@ -2,7 +2,7 @@
 title: "Onion Routing: Preliminaries"
 summary: "This post covers the basics of choosing a path and packaging 
 information for each hop on the path"
-date: 2024-03-22
+date: 2024-03-21
 ShowToc: true
 
 cover:
