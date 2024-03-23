@@ -11,12 +11,12 @@ cover:
 
 # Overview
 
-In this post, we get back to basics. It covers the preliminaries you need to
-be aware of for pathfinding, and it also sets the scene for Sphinx packet 
-construction which will be covered in a [follow-up post][sphinx]. Specifically, 
-we answer some basic questions such as: "For a node making a payment, how do I 
-find a path to the destination node? And how do I communicate to each node on 
-the path what it should do?"
+In this post will cover the preliminaries you need to be aware of for 
+pathfinding, and it also sets the scene for Sphinx packet construction which 
+will be covered in a [follow-up post][sphinx]. Specifically, we answer some 
+basic questions such as: "For a node making a payment, how do I find a path to 
+the destination node? And how do I communicate to each node on the path what it 
+should do?"
 
 By the end of this post, you should understand what information the sender
 needs in order to construct a path, what information it must communicate to each
@@ -33,7 +33,7 @@ time to shine) they are two nodes on the Lightning Network.
 
 ![](/onion_prelims/1-alice-and-dave.png#center)
 
-Alice wants to pay Dave for a coffee and so Dave generates an Invoice and shows 
+Alice wants to pay Dave for a coffee and so Dave generates an invoice and shows 
 it to Alice using a QR code.
 
 ![](/onion_prelims/2-invoice.png#center)
@@ -90,7 +90,8 @@ about the `channel_update` from nodes where we will potentially be sending
 across their channel in the outbound direction. For example: Both Bob and 
 Charlie have advertised `channel_updates` referring to channel `BC`, but 
 because Alice only cares about the direction from Bob to Charlie, she only 
-needs to look at the information from his `channel_update`.
+needs to look at the information from Bob's `channel_update` for the channel 
+since it always refers to the outgoing direction.
 
 ![](/onion_prelims/5-path-choices.png#center)
 
@@ -111,8 +112,8 @@ To work out the total fees for a path, we have to work backwards from the
 destination.
 
 - We know that Dave should be paid 4999999 msats (he said so in his invoice) 
-  which means that this is the number of sats routed through Charlie. So the 
-  amount of fees to pay to Charlie can be calculated as follows:
+  which means that this is the number of sats that will be routed through 
+  Charlie. So the amount of fees to pay to Charlie can be calculated as follows:
 
 ```
  = Charlie’s Base Fee + Charlie’s proportional fee in parts per million/1000000 * (The amount routed through Charlie)
@@ -129,8 +130,8 @@ So the total number of sats that should be sent to Charlie is:
  = 5005099 msats
 ```
 
-- 5005099 msats need to be routed through Bob, so the fees we would need to pay
-  to Bob are:
+- 5005099 msats need to be routed through Bob, so the fee we would need to pay
+  to Bob is:
  
 ```
  = 200 + 2000/1000000(5005099)
@@ -194,7 +195,9 @@ calculate that the outgoing CLTV value on the HTLC should be 1010.
 
 Using the fee calculation we did earlier for this path, Alice can also determine 
 what the `update_add_htlc`s should look like for the Bob-to-Charlie and 
-Alice-to-Bob steps.
+Alice-to-Bob steps. If the fact that the CLTVs for each HTLC increases from 
+right to left is confusing, check out [this](#a-note-on-cltv-deltas) quick CLTV 
+delta explainer. 
 
 ![](/onion_prelims/8-other-hop-info.png#center)
 
@@ -219,23 +222,29 @@ must "peel" like an onion.
 Let’s take a moment to imagine what the actual onion packets will look like. 
 Heads up here that this is _not_ the final construction. I will build up a 
 possible structure here, and then I will explain why this is not the way things 
-actually look.
+actually look. The details of how this is actually done will be covered in the 
+[next post][sphinx].
 
 Ok so Alice knows what she wants to tell each of the hops. This is called the 
-“payload” the hop. She puts together the following packet for Bob:
+“hop payload”. She puts together the following packet for Bob:
 
 ![](/onion_prelims/10-naive-bob-pkt.png#center)
 
 The packet has the following components:
 - 1 byte packet version byte
 - Alice’s public key
-- The payloads for each hop along with an HMAC that that hop will need to pass 
-  the packet on to the next hop (this will be more clear in a moment).
+- The payloads for each hop. Note that each payload also has an HMAC which that 
+  hop will need to pass the packet on to the next hop (this will be more clear 
+  in a moment).
 - Finally, an HMAC produced by Alice using her key over the packet’s hop 
   payloads.
 
+(What is an HMAC? I'll explain this better in the next post but for now, just 
+think of it as a digital signature used to verify the integrity of a payload)
+
 Bob will receive this packet and will do the following:
-1. He will check that the HMAC is valid.
+1. He will check that the HMAC is valid (in other words he checks that the 
+   packet has not been tampered with).
 2. He will read the payload meant for him along with the HMAC.
 3. He will reconstruct the packet that should be passed on to Charlie. He will 
    append the HMAC given to him by Alice for this packet since he cannot produce 
@@ -252,8 +261,9 @@ Charlie will receive this packet and do the following:
 ![](/onion_prelims/12-naive-dave-pkt.png#center)
 
 Dave will receive this packet and do the following:
-1. He will check that the HMAC is valid
-2. He will read the payload meant for him along with the HMAC
+
+1. He will check that the HMAC is valid.
+2. He will read the payload meant for him along with the HMAC.
 3. The HMAC he receives will be an empty byte array. This indicates to Dave that
    he is the final hop.
 
@@ -261,8 +271,8 @@ Ok so what are some issues with this construction?
 
 - Each hop can read the payload for each hop that follows. This leaks who the 
   receiver is.
-- Each hop is told Alice’s public key and so they all know who is sending to the 
-  receiver.
+- Each hop is told Alice’s public key, and so they all know who is sending to 
+  the receiver.
 - Even if the individual payloads were encrypted, the packet gets smaller and 
   smaller further along the path and so intermediary nodes would be able to 
   guess how far they are away from the final hop based on the packet length.
@@ -299,9 +309,9 @@ able to sweep the pre-image path. To prevent this race, Dave will want some time
 where he can confidently spend the pre-image path if he needs to before the 
 timelock path becomes spendable. He communicates his desired buffer, 9 blocks,  
 using the `min_final_cltv_expiry_delta` field of the invoice that he sends to 
-Alice. Alice then knows that if she where to send the payment right now while 
+Alice. Alice then knows that if she were to send the payment right now while 
 the block height is 1001, that Dave will fail any incoming HTLC with a `CLTV A` 
-smaller than 1010.
+smaller than 1010 (1001 + 9). 
 
 Now, let’s zoom out a bit more and include the HTLC between Bob and Charlie. We 
 want to now figure out what an appropriate value would be for the CLTV on the 
@@ -312,7 +322,7 @@ HTLC between Bob and Charlie, `CLTV B`.
 Let’s assume that Dave waits until the very last minute to reveal the pre-image 
 to Charlie. In other words, he waits until just before block 1010 is mined. 
 Charlie now needs to turn around and present this pre-image to Bob. In the case 
-that Bob goes on-chain with the HTLC, Charlie requires  some time where he can 
+that Bob goes on-chain with the HTLC, Charlie requires some time where he can 
 spend the pre-image path without worrying about Bob being able to spend the 
 timeout path. This buffer that Charlie requires between receiving the pre-image 
 from Dave and being able to spend the pre-image path safely from the HTLC with 
@@ -347,6 +357,14 @@ policy rules for the channel.
 ![](/onion_prelims/14-invoice-hop-hint.png#center)
 
 The rest of the path finding process is the same :)
+
+# Conclusion
+
+Alrighty! I hope things are making a bit more sense now and that you understand 
+both how a sender goes about finding a path to a destination node along with 
+what the sender needs to communicate to each node on the path. In the 
+[next post][sphinx] we will take a deep dive into exactly how the onion packet 
+carrying the hop payloads is constructed to maintain maximum privacy.
 
 [chan-open-post]: ../../posts/open_channel_pre_taproot
 [sphinx]: ../../drafts/sphinx
