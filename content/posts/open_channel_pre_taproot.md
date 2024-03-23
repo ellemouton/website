@@ -2,6 +2,7 @@
 title: "Opening and announcing a pre-taproot LN channel"
 summary: "A deep dive into opening a pre-taproot Lightning Network channel"
 date: 2023-01-23
+ShowToc: true
 aliases:
   - /open_channel_pre_taproot
 

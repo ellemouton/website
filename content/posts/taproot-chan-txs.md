@@ -2,6 +2,7 @@
 title: "Taproot Channel Transactions"
 summary: "A deep-dive into the structure of Taproot channel transactions"
 date: 2023-04-25
+ShowToc: true
 aliases:
   - /taproot-chan-txs
 
