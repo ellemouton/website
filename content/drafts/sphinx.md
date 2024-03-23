@@ -1,7 +1,7 @@
 ---
 title: "Onion Routing: Sphinx Packet Construction"
 summary: "Diving into all things BOLT-04"
-date: 2024-03-26
+date: 2024-03-22
 ShowToc: true
 
 cover:
