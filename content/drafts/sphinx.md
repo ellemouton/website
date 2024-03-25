@@ -198,7 +198,7 @@ $HMAC_1$ calculated above. Once again, the packet length is kept to 1300 bytes.
 ![](/onion/9-wrap_charlie_1.png#center)
 
 Similarly to the encryption for Dave, Alice now uses her shared secret with 
-Charlie, $s_{AC}$ to derive a pseudo random byte stream which she XORs with 
+Charlie, $ss_{AC}$ to derive a pseudo random byte stream which she XORs with 
 the onion packet. This produces the encrypted packet destined for Charlie. Once 
 again, Alice calculates an appropriate HMAC for this payload.
 
@@ -206,7 +206,7 @@ again, Alice calculates an appropriate HMAC for this payload.
 
 Ok last layer! Finally, Alice slides Bob’s payload in at the start of the 
 packet and clips off the rest so that it is still a 1300 byte packet. She then 
-XORs this with a byte stream derived from her shared secret with Bob, $s_{AB}$,
+XORs this with a byte stream derived from her shared secret with Bob, $ss_{AB}$,
 and then finally calculates the HMAC for this packet: $HMAC_3$.
 
 ![](/onion/10-wrap_bob_1.png#center)
