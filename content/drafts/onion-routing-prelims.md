@@ -1,5 +1,5 @@
 ---
-title: "Onion Routing: Preliminaries"
+title: "Lightning Network Onion Routing: Preliminaries"
 summary: "This post covers the basics of choosing a path and packaging 
 information for each hop on the path"
 date: 2024-03-21
