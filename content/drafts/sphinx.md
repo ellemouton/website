@@ -139,7 +139,9 @@ postfixed with a 32 HMAC.
 ![](/onion/5-payloads.png#center)
 
 Alice now goes ahead and generates a `session_key` and uses this to derive the 
-chain of [ephemeral keys](#ephemeral-keys). 
+chain of [ephemeral keys](#ephemeral-keys). Note that "bf" here stands for 
+"blinding factor". A blinding factor is used to tweak a private key or public 
+key. 
 
 ![](/onion/3-ephemeral_keys.png#center)
 
