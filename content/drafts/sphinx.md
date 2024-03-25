@@ -76,12 +76,9 @@ should become more clear with the long-running example later.
 # HMAC
 
 A [Hash-Based Message Authentication Code (or HMAC)][hmac] is a message 
-authentication technique. Basically, a party with a private-public key pair, 
-can use the private key along with the hash of a message they would like to 
-sign to produce a 32 byte “signature” called an HMAC. Then any other party can 
-be given the message, the HMAC and the signer’s public key and can verify that 
-the owner of the private key corresponding to the given public key did in fact 
-create this HMAC.
+authentication technique. It is a cryptographic hash function that takes in a 
+message to produce the code over along with a secret key. The code is only 
+producible and verifiable by parties that have knowledge of the secret key.
 
 HMACs will be used throughout the sphinx packet construction so that each hop 
 can verify that the contents of the packet (the message) has not been tampered 
@@ -181,13 +178,13 @@ padding is chopped off.
 
 ![](/onion/7-wrap_dave_1.png#center)
 
-Alice then uses her shared key with Dave, $ss_{AB}$ along with the `rho` 
+Alice then uses her shared key with Dave, $ss_{AD}$, along with the `rho` 
 constant to derive a pseudo random stream of 1300 bytes. This stream is XOR'd 
 with the onion packet which produces an encrypted packet that only Dave would 
-be able to decrypt. Alice uses the $e_{AD}$ ephemeral key along with a hash of
-the onion at this point to calculate an HMAC for this packet. Dave will later 
-verify that his HMAC is valid against the hash of the packet he receives along 
-with the ephemeral public key $E_{AD}$. 
+be able to decrypt. Alice then uses $ss_{AD}$, the `mu` constant and the packet 
+contents at this point to calculate an HMAC for this packet. Dave will later 
+verify that this HMAC is equal to the HMAC that he produces over the packet when 
+he receives.
 
 ![](/onion/8-wrap_dave_2.png#center)
 
@@ -224,20 +221,23 @@ Alice now hands this packet to Bob.
 
 ### Bob peels a layer
 
-The first thing that Bob needs to do is to validate that the HMAC is valid given 
-the onion packet contents and the provided ephemeral key.
+The first thing that Bob will do is to derive the shared key between him and 
+Alice using the ephemeral key, $E_{AB}$. While he is at it, he can also already 
+compute the _next_ ephemeral key that he will need to communicate with Charlie.
+
+![](/onion/13-bob_keys.png#center)
+
+Then, Bob needs to validate the HMAC. He does this by using the derived shared 
+secret with Alice, $ss_{AB}$, along with the `mu` constant and the onion packet 
+contents to compute expected HMAC for the payload. The HMAC is valid if it is 
+equal to the one he received from Alice that was appended to the end of the 
+packet. 
 
 ![](/onion/12-peel_bob_1.png#center)
 
 This HMAC should be valid because you can see that the package contents in the 
 above image is the same as the package contents that Alice used to create this 
 HMAC.
-
-The next thing Bob will do is to derive the shared key between him and Alice. 
-While he is at it, he can also already compute the _next_ ephemeral key that he 
-will need to communicate with Charlie.
-
-![](/onion/13-bob_keys.png#center)
 
 Great! Now Bob is ready to do some decrypting. Since he was able to derive the 
 secret key $ss_{AB}$, he is able to derive the same pseudo random byte stream 
@@ -271,23 +271,23 @@ to Charlie.
 
 ### Charlie peels a layer
 
-Charlie receives the packaged onion from Bob and does a similar verification 
-process: He first checks to see if the HMAC is valid given the payload. Ok this 
-is where the issue lies! If you scroll back to see the diagram showing the 
-message that Alice used to create this HMAC, you will see that the packet 
-looked different. But now we at least know what the packet _should_ look like 
-when Alice calculates the hash for Charlie.
+Charlie receives the packaged onion from Bob. The first thing is does is to use 
+the ephemeral key $E_{AC}$ along with his own private key, `c`, to derive the 
+shared secret between him and Alice. He then uses this to derive the ephemeral 
+key for Dave too.
+
+![](/onion/17-charlie_keys.png#center)
+
+Then, he checks to see if the HMAC is valid given the payload. Ok this is where 
+the issue lies! If you scroll back to see the diagram showing the message that 
+Alice used to create this HMAC, you will see that the packet looked different. 
+But now we at least know what the packet _should_ look like when Alice 
+calculates the HMAC for Charlie.
 
 ![](/onion/16-peel_charlie_1.png#center)
 
 For the sake of completion _and_ so we can find out where else things might 
 have gone wrong, let’s assume that Charlie continues the process.
-
-He will use the ephemeral key $E_{AC}$ along with his own private key, `c`, to 
-derive the shared secret between him and Alice. He then uses this to derive the 
-ephemeral key for Dave too.
-
-![](/onion/17-charlie_keys.png#center)
 
 Charlie uses the shared secret key to decrypt the packet similarly to how Bob 
 did it. He then can read his payload and reconstruct the packet for Dave. 
@@ -296,18 +296,19 @@ did it. He then can read his payload and reconstruct the packet for Dave.
 
 ### Dave peels a layer
 
-Dave then gets this packet and attempts to do the HMAC verification. Once 
-again, this will fail since the packet contents does not match the packet 
-contents that Alice used when creating the HMAC. But again, we now know what it 
-should look like, and we will use this information on our second attempt. 
-
-![](/onion/19-peel_dave_1.png#center)
-
-Like all the other hops, Dave calculates his shared secret with Alice…
+Dave receives the packet and derives his shared secret key with Alice:
 
 ![](/onion/20-dave_keys.png#center)
 
-… and uses that do decrypt the packet.
+He then attempts to do the HMAC verification. Once again, this will fail since 
+the packet contents does not match the packet contents that Alice used when 
+creating the HMAC. But again, we now know what it should look like, and we will 
+use this information on our second attempt. 
+
+![](/onion/19-peel_dave_1.png#center)
+
+Let's again assume that Dave continues and uses the shared secret to decrypt the 
+packet.
 
 ![](/onion/21-peel_dave_2.png#center)
 
@@ -345,7 +346,7 @@ Again we slide in Dave’s payload and encrypt it:
 
 ![](/onion/24-wrap_dave.png#center)
 
-Here is where things change! We know that before Alice hashes Dave’s payload to 
+Here is where things change! We know that before Alice uses Dave’s payload to 
 compute the HMAC, she must first insert the filler. 
 
 ![](/onion/25-wrap_dave_2.png#center)
