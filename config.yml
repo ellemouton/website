@@ -22,7 +22,25 @@ outputs:
      - RSS
      - JSON
 
+markup:
+  goldmark:
+    extensions:
+      passthrough:
+        delimiters:
+          block:
+            - - \[
+              - \]
+            - - $$
+              - $$
+          inline:
+            - - \(
+              - \)
+            - - $
+              - $
+        enable: true
+
 params:
+  math: true
   comments: true
   defaultTheme: light # auto, dark
   ShowShareButtons: true
