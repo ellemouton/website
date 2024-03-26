@@ -1,7 +1,7 @@
 ---
 title: "Lightning Network Onion Routing: Sphinx Packet Construction"
 summary: "Diving into all things BOLT-04"
-date: 2024-03-22
+date: 2024-03-26
 ShowToc: true
 
 cover:
