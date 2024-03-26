@@ -367,4 +367,4 @@ what the sender needs to communicate to each node on the path. In the
 carrying the hop payloads is constructed to maintain maximum privacy.
 
 [chan-open-post]: ../../posts/open_channel_pre_taproot
-[sphinx]: ../../drafts/sphinx
+[sphinx]: ../../posts/sphinx

@@ -443,7 +443,7 @@ questions - leave a comment below. If there are corrections that you think
 should be made to the text, feel free to let me know or to open a pull request 
 on the website’s GitHub page.
 
-[onion-prelims]: ../../drafts/onion-routing-prelims
+[onion-prelims]: ../../posts/onion-routing-prelims
 [bolt-4]: https://github.com/lightning/bolts/blob/master/04-onion-routing.md
 [dhke]: https://www.techtarget.com/searchsecurity/definition/Diffie-Hellman-key-exchange
 [hmac]: https://en.wikipedia.org/wiki/HMAC
