@@ -95,7 +95,7 @@ since it always refers to the outgoing direction.
 
 ![](/onion_prelims/5-path-choices.png#center)
 
-The above diagram shows the two potential paths from Alice to Bob:
+The above diagram shows the two potential paths from Alice to Dave:
 
 ```
 1. Alice -> Bob -> Charlie -> Dave via channels AB, BC and CD
