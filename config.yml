@@ -15,7 +15,7 @@ menu:
         url: search/
         weight: 10
 
-# Needed for seach functionality
+# Needed for search functionality
 outputs:
  home:
      - HTML
@@ -62,7 +62,13 @@ params:
         url: "https://www.linkedin.com/in/elle-mouton-50635a143/"
       - name: email
         url: "mailto://elle@lightning.engineering"
+      - name: "rss"
+        url: "https://www.ellemouton.com/index.xml"
 
   buttons:
       - name: Archives
         url: archives
+
+  author:
+    email: elle.mouton@gmail.com
+    name: Elle Mouton
