@@ -72,3 +72,5 @@ params:
   author:
     email: elle.mouton@gmail.com
     name: Elle Mouton
+
+  ShowFullTextinRSS: true
