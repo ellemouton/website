@@ -8,6 +8,9 @@ enableEmoji: true
 
 menu:
   main:
+      - name: CV
+        url: CV_Elle_Mouton.pdf
+        weight: 1
       - name: Archive
         url: archives
         weight: 5
