@@ -49,8 +49,8 @@ params:
   ShowShareButtons: true
   
   homeInfoParams:
-        Title: "Mah Brain Nonsense"
-        Content: Welcome! Here be Bitcoin & Lightning related things. 
+        Title: "Layer by Layer"
+        Content: Welcome! Here you'll find deep dives into Bitcoin and Lightning Network protocols. 
 
   socialIcons:
       - name: github
