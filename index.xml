@@ -350,7 +350,7 @@ questions - leave a comment below. If there are corrections that you think
 should be made to the text, feel free to let me know or to open a pull request
 on the <a href="https://github.com/ellemouton/website">website’s GitHub page</a>.</p>
 ]]></content:encoded></item><item><title>Lightning Network Onion Routing: Preliminaries</title><link>https://www.ellemouton.com/posts/onion-routing-prelims/</link><pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate><guid>https://www.ellemouton.com/posts/onion-routing-prelims/</guid><description>This post covers the basics of choosing a path and packaging information for each hop on the path</description><content:encoded><![CDATA[<h1 id="overview">Overview</h1>
-<p>In this post will cover the preliminaries you need to be aware of for
+<p>This post will cover the preliminaries you need to be aware of for
 pathfinding, and it also sets the scene for Sphinx packet construction which
 will be covered in a <a href="../../posts/sphinx">follow-up post</a>. Specifically, we answer some
 basic questions such as: &ldquo;For a node making a payment, how do I find a path to
