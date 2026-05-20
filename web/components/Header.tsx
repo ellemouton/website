@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -11,7 +12,7 @@ export function Header() {
           height: "var(--header-height)",
         }}
       >
-        <div className="logo">
+        <div className="logo flex items-center gap-3">
           <Link
             href="/"
             className="text-2xl font-bold"
@@ -20,6 +21,7 @@ export function Header() {
           >
             {siteConfig.title}
           </Link>
+          <ThemeToggle />
         </div>
         <ul
           id="menu"

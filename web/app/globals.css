@@ -31,6 +31,20 @@
     --border: rgb(238, 238, 238);
 }
 
+/* Dark theme tokens — applied when the <html> element has class="dark".
+ * Values mirror PaperMod's dark palette so the look is identical. */
+.dark {
+    --theme: rgb(29, 30, 32);
+    --entry: rgb(46, 46, 51);
+    --primary: rgb(218, 218, 219);
+    --secondary: rgb(155, 156, 157);
+    --tertiary: rgb(65, 66, 68);
+    --content: rgb(196, 196, 197);
+    --hljs-bg: rgb(46, 46, 51);
+    --code-bg: rgb(55, 56, 62);
+    --border: rgb(51, 51, 51);
+}
+
 @theme inline {
     --color-theme: var(--theme);
     --color-entry: var(--entry);
@@ -122,8 +136,28 @@ a {
     color: var(--secondary);
 }
 
-.post-content ul, .post-content ol {
+/* Tailwind preflight strips list markers globally; restore them inside
+ * post content so the original blog post bullets/numbers render again. */
+.post-content ul {
     padding-left: 26px;
+    list-style: disc outside;
+}
+
+.post-content ol {
+    padding-left: 26px;
+    list-style: decimal outside;
+}
+
+.post-content ul ul {
+    list-style: circle outside;
+}
+
+.post-content ul ul ul {
+    list-style: square outside;
+}
+
+.post-content li {
+    margin: 0.25em 0;
 }
 
 .post-content img {
@@ -132,13 +166,8 @@ a {
     height: auto;
 }
 
-/* Default content width matches PaperMod's 720px. About page widens so
- * the sidebar + content layout can breathe — same trick used in the Hugo
- * version via :has(). */
+/* Content width matches PaperMod's 720px — same on every page now that
+ * About no longer needs the wider sidebar layout. */
 .main {
     max-width: calc(var(--main-width) + var(--gap) * 2);
-}
-
-.main:has(.about-page) {
-    max-width: calc(1280px + var(--gap) * 2);
 }
