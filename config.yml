@@ -8,6 +8,9 @@ enableEmoji: true
 
 menu:
   main:
+      - name: About
+        url: about/
+        weight: 0
       - name: CV
         url: CV_Elle_Mouton.pdf
         weight: 1
@@ -27,6 +30,10 @@ outputs:
 
 markup:
   goldmark:
+    renderer:
+      # Allow inline HTML (e.g. logo <img> tags in headings) in markdown.
+      # Safe here because all content is authored by the site owner.
+      unsafe: true
     extensions:
       passthrough:
         delimiters:
@@ -50,7 +57,12 @@ params:
   
   homeInfoParams:
         Title: "Layer by Layer"
-        Content: Welcome! Here you'll find deep dives into Bitcoin and Lightning Network protocols. 
+        Content: |
+          Welcome! Here you'll find deep dives into Bitcoin and Lightning Network protocols. New here? Start with the [about page](/about/).
+
+  homeButtons:
+      - name: "About me"
+        url: "/about/"
 
   socialIcons:
       - name: github
