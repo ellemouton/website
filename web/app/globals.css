@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/* KaTeX styles for math rendering (remark-math + rehype-katex). */
+@import "katex/dist/katex.min.css";
+
+/* highlight.js GitHub-dark theme. The `pre` background is driven by
+ * --hljs-bg which PaperMod sets to a dark value in *both* light and
+ * dark site themes (intentional — code blocks look the same regardless
+ * of which theme the rest of the page uses). The light github theme
+ * paints dark syntax tokens that disappear against this background;
+ * github-dark is the matched pair. */
+@import "highlight.js/styles/github-dark.css";
+
+/* PaperMod's design tokens, transplanted. Keeping the names identical
+ * (--theme, --primary, --content, --gap, ...) makes it easy to spot
+ * which token is doing what when cross-referencing with the Hugo CSS. */
+:root {
+    --gap: 24px;
+    --content-gap: 20px;
+    --nav-width: 1024px;
+    --main-width: 720px;
+    --header-height: 60px;
+    --footer-height: 60px;
+    --radius: 8px;
+
+    --theme: rgb(255, 255, 255);
+    --entry: rgb(255, 255, 255);
+    --primary: rgb(30, 30, 30);
+    --secondary: rgb(108, 108, 108);
+    --tertiary: rgb(214, 214, 214);
+    --content: rgb(31, 31, 31);
+    --hljs-bg: rgb(28, 29, 33);
+    --code-bg: rgb(245, 245, 245);
+    --border: rgb(238, 238, 238);
+}
+
+/* Dark theme tokens — applied when the <html> element has class="dark".
+ * Values mirror PaperMod's dark palette so the look is identical. */
+.dark {
+    --theme: rgb(29, 30, 32);
+    --entry: rgb(46, 46, 51);
+    --primary: rgb(218, 218, 219);
+    --secondary: rgb(155, 156, 157);
+    --tertiary: rgb(65, 66, 68);
+    --content: rgb(196, 196, 197);
+    --hljs-bg: rgb(46, 46, 51);
+    --code-bg: rgb(55, 56, 62);
+    --border: rgb(51, 51, 51);
+}
+
+@theme inline {
+    --color-theme: var(--theme);
+    --color-entry: var(--entry);
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-content: var(--content);
+    --color-border: var(--border);
+}
+
+html {
+    -webkit-tap-highlight-color: transparent;
+    overflow-y: scroll;
+}
+
+body {
+    background: var(--theme);
+    color: var(--primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    word-break: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    color: var(--primary);
+}
+
+a {
+    color: inherit;
+}
+
+/* Post content typography — modelled on PaperMod's .post-content rules so
+ * blog posts render with the same rhythm as the live site. */
+.post-content {
+    color: var(--content);
+}
+
+.post-content :where(p, ul, ol, blockquote, pre, table, figure) {
+    margin-bottom: var(--content-gap);
+}
+
+.post-content :where(h1, h2, h3, h4, h5, h6) {
+    margin-top: calc(var(--content-gap) * 2);
+    margin-bottom: var(--content-gap);
+}
+
+.post-content h1 { font-size: 40px; }
+.post-content h2 { font-size: 32px; }
+.post-content h3 { font-size: 24px; }
+.post-content h4 { font-size: 20px; }
+
+.post-content a {
+    color: var(--secondary);
+    box-shadow: 0 1px 0 var(--secondary);
+}
+
+.post-content a:hover {
+    color: var(--primary);
+    box-shadow: 0 1px 0 var(--primary);
+}
+
+.post-content code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.9em;
+}
+
+.post-content pre {
+    background: var(--hljs-bg);
+    color: rgb(213, 213, 214);
+    border-radius: var(--radius);
+    padding: 14px;
+    overflow-x: auto;
+}
+
+.post-content pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.post-content blockquote {
+    border-left: 3px solid var(--primary);
+    padding: 0 14px;
+    color: var(--secondary);
+}
+
+/* Tailwind preflight strips list markers globally; restore them inside
+ * post content so the original blog post bullets/numbers render again. */
+.post-content ul {
+    padding-left: 26px;
+    list-style: disc outside;
+}
+
+.post-content ol {
+    padding-left: 26px;
+    list-style: decimal outside;
+}
+
+.post-content ul ul {
+    list-style: circle outside;
+}
+
+.post-content ul ul ul {
+    list-style: square outside;
+}
+
+.post-content li {
+    margin: 0.25em 0;
+}
+
+.post-content img {
+    border-radius: var(--radius);
+    max-width: 100%;
+    height: auto;
+}
+
+/* Content width matches PaperMod's 720px on post pages — narrow column
+ * is comfortable for long-form reading. About widens to fit the sticky
+ * ToC sidebar + main content side-by-side. */
+.main {
+    max-width: calc(var(--main-width) + var(--gap) * 2);
+}
+
+.main:has(.about-page) {
+    max-width: calc(900px + var(--gap) * 2);
+}
+
+/* Post-page Table of Contents — modelled on PaperMod's .toc block.
+ * Lives inside .post-content (between header and body) so it inherits
+ * the post column width without extra layout work. Muted card look
+ * via --code-bg / --entry to recede from the surrounding prose. */
+.post-single .toc {
+    margin: 0 2px 40px 2px;
+    border: 1px solid var(--border);
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 0.4em;
+}
+
+.dark .post-single .toc {
+    background: var(--entry);
+}
+
+.post-single .toc summary {
+    cursor: zoom-in;
+    margin-inline-start: 20px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.post-single .toc details[open] summary {
+    cursor: zoom-out;
+}
+
+.post-single .toc .inner {
+    margin: 0 20px;
+    padding: 10px 20px;
+}
+
+.post-single .toc ul {
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.post-single .toc li {
+    margin: 0.2em 0;
+}
+
+/* Nested h3 entries indent under their parent h2. */
+.post-single .toc li ul {
+    margin-inline-start: var(--gap);
+    list-style: none;
+}
+
+.post-single .toc a {
+    color: var(--secondary);
+    box-shadow: none;
+}
+
+.post-single .toc a:hover {
+    color: var(--primary);
+}
+
+/* About-sidebar ToC: the dash on the left of each entry extends on
+ * hover, à la tamir.io. Keeping the animation on a span with a
+ * transitioning width gives smooth, GPU-friendly motion. */
+.toc-link .toc-dash {
+    width: 14px;
+}
+.toc-link:hover .toc-dash {
+    width: 28px;
+}
+
+/* Theme-toggle icon visibility: which SVG is rendered depends solely on
+ * the `dark` class that ThemeScript sets pre-hydration. Both SVGs ship
+ * with the button so the icon is correct even if hydration is slow or
+ * skipped. */
+.theme-toggle .theme-toggle-sun {
+    display: none;
+}
+.dark .theme-toggle .theme-toggle-moon {
+    display: none;
+}
+.dark .theme-toggle .theme-toggle-sun {
+    display: inline-block;
+}
