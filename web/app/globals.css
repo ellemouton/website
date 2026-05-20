@@ -3,10 +3,13 @@
 /* KaTeX styles for math rendering (remark-math + rehype-katex). */
 @import "katex/dist/katex.min.css";
 
-/* highlight.js GitHub-light theme to match PaperMod's `--code-bg` aesthetic
- * in light mode. Loaded via npm-installed `highlight.js` (transitive dep of
- * rehype-highlight). */
-@import "highlight.js/styles/github.css";
+/* highlight.js GitHub-dark theme. The `pre` background is driven by
+ * --hljs-bg which PaperMod sets to a dark value in *both* light and
+ * dark site themes (intentional — code blocks look the same regardless
+ * of which theme the rest of the page uses). The light github theme
+ * paints dark syntax tokens that disappear against this background;
+ * github-dark is the matched pair. */
+@import "highlight.js/styles/github-dark.css";
 
 /* PaperMod's design tokens, transplanted. Keeping the names identical
  * (--theme, --primary, --content, --gap, ...) makes it easy to spot
