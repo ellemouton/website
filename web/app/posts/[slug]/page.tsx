@@ -19,9 +19,25 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const post = await getPost(slug);
+    // Posts can opt into a custom share thumbnail via their `cover.image`
+    // frontmatter (already used as the home-page card image). If absent
+    // we let Next.js fall back to the site-wide OG image from layout.tsx.
+    const cover = post.frontmatter.cover?.image;
     return {
       title: post.frontmatter.title,
       description: post.frontmatter.summary,
+      openGraph: {
+        title: post.frontmatter.title,
+        description: post.frontmatter.summary,
+        type: "article",
+        ...(cover ? { images: [cover] } : {}),
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.frontmatter.title,
+        description: post.frontmatter.summary,
+        ...(cover ? { images: [cover] } : {}),
+      },
     };
   } catch {
     return {};

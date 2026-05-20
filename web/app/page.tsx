@@ -29,7 +29,7 @@ export default async function Home() {
         </header>
         <div className="entry-content mt-4 text-[color:var(--secondary)]">
           Welcome! Here you&rsquo;ll find deep dives into Bitcoin and Lightning
-          Network protocols. New here? Start with the{" "}
+          Network protocols. Want to get to know me? Start with the{" "}
           <Link
             href="/about/"
             className="underline decoration-[color:var(--secondary)] hover:decoration-[color:var(--primary)]"
@@ -37,14 +37,6 @@ export default async function Home() {
             about page
           </Link>
           .
-        </div>
-        <div className="home-buttons mt-4">
-          <Link
-            href="/about/"
-            className="inline-block rounded-md bg-[color:var(--primary)] px-4 py-2 font-semibold text-[color:var(--theme)] hover:opacity-85"
-          >
-            About me
-          </Link>
         </div>
         <footer className="entry-footer mt-3">
           <SocialIcons />
