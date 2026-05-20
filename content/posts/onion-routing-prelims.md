@@ -11,7 +11,7 @@ cover:
 
 # Overview
 
-In this post will cover the preliminaries you need to be aware of for 
+This post will cover the preliminaries you need to be aware of for 
 pathfinding, and it also sets the scene for Sphinx packet construction which 
 will be covered in a [follow-up post][sphinx]. Specifically, we answer some 
 basic questions such as: "For a node making a payment, how do I find a path to 
