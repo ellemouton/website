@@ -93,7 +93,17 @@ export async function getPost(slug: string): Promise<Post> {
     .use(rehypeHighlight, { detect: true })
     .use(rehypeStringify, { allowDangerousHtml: true })
     .process(content);
-  const contentHtml = processed.toString();
+  let contentHtml = processed.toString();
+
+  // Native browser lazy-load + async-decode on every <img> that doesn't
+  // already opt out. Posts have many large PNG diagrams (sphinx,
+  // onion-routing-prelims, normalChanOp...) and serving them all
+  // eagerly on first paint was visibly slow. `loading="lazy"` defers
+  // off-screen images; `decoding="async"` keeps the main thread free.
+  contentHtml = contentHtml.replace(
+    /<img(?![^>]*\bloading=)/g,
+    '<img loading="lazy" decoding="async"',
+  );
 
   return {
     slug,
