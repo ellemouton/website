@@ -59,7 +59,7 @@ export default function AboutPage() {
       <div className="post-content space-y-2">
         <h2 id="about">About</h2>
         <p>
-          Software engineer with 5+ years building production-scale distributed
+          I&rsquo;m a Software engineer with 5+ years building production-scale distributed
           systems in Go — from high-volume financial microservices serving
           millions of users to LND, the most widely deployed Lightning Network
           (Bitcoin L2) implementation, operating across ~16k nodes and ~50k
