@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getPost, listPostSlugs } from "@/lib/posts";
 import { siteConfig } from "@/lib/site-config";
 import { Utterances } from "@/components/Utterances";
+import { PostToc } from "@/components/PostToc";
 
 export async function generateStaticParams() {
   const slugs = await listPostSlugs();
@@ -88,6 +89,8 @@ export default async function PostPage({
           <span>{siteConfig.author}</span>
         </div>
       </header>
+
+      <PostToc html={post.contentHtml} />
 
       <div
         className="post-content"

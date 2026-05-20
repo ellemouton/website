@@ -180,6 +180,63 @@ a {
     max-width: calc(900px + var(--gap) * 2);
 }
 
+/* Post-page Table of Contents — modelled on PaperMod's .toc block.
+ * Lives inside .post-content (between header and body) so it inherits
+ * the post column width without extra layout work. Muted card look
+ * via --code-bg / --entry to recede from the surrounding prose. */
+.post-single .toc {
+    margin: 0 2px 40px 2px;
+    border: 1px solid var(--border);
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    padding: 0.4em;
+}
+
+.dark .post-single .toc {
+    background: var(--entry);
+}
+
+.post-single .toc summary {
+    cursor: zoom-in;
+    margin-inline-start: 20px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.post-single .toc details[open] summary {
+    cursor: zoom-out;
+}
+
+.post-single .toc .inner {
+    margin: 0 20px;
+    padding: 10px 20px;
+}
+
+.post-single .toc ul {
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.post-single .toc li {
+    margin: 0.2em 0;
+}
+
+/* Nested h3 entries indent under their parent h2. */
+.post-single .toc li ul {
+    margin-inline-start: var(--gap);
+    list-style: none;
+}
+
+.post-single .toc a {
+    color: var(--secondary);
+    box-shadow: none;
+}
+
+.post-single .toc a:hover {
+    color: var(--primary);
+}
+
 /* About-sidebar ToC: the dash on the left of each entry extends on
  * hover, à la tamir.io. Keeping the animation on a span with a
  * transitioning width gives smooth, GPU-friendly motion. */
