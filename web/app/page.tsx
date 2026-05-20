@@ -1,65 +1,101 @@
+import Link from "next/link";
 import Image from "next/image";
+import { listPosts } from "@/lib/posts";
+import { siteConfig } from "@/lib/site-config";
+import { SocialIcons } from "@/components/SocialIcons";
 
-export default function Home() {
+function formatDate(d: string | Date | undefined) {
+  if (!d) return "";
+  const date = new Date(d);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export default async function Home() {
+  const posts = await listPosts();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      {/* Welcome blurb (Hugo's `home-info` first-entry block) */}
+      <article
+        className="first-entry home-info"
+        style={{ marginBottom: "calc(var(--gap) * 1.5)" }}
+      >
+        <header className="entry-header">
+          <h1 className="text-4xl font-extrabold">{siteConfig.homeTitle}</h1>
+        </header>
+        <div className="entry-content mt-4 text-[color:var(--secondary)]">
+          Welcome! Here you&rsquo;ll find deep dives into Bitcoin and Lightning
+          Network protocols. New here? Start with the{" "}
+          <Link
+            href="/about/"
+            className="underline decoration-[color:var(--secondary)] hover:decoration-[color:var(--primary)]"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            about page
+          </Link>
+          .
         </div>
-      </main>
-    </div>
+        <div className="home-buttons mt-4">
+          <Link
+            href="/about/"
+            className="inline-block rounded-md bg-[color:var(--primary)] px-4 py-2 font-semibold text-[color:var(--theme)] hover:opacity-85"
+          >
+            About me
+          </Link>
+        </div>
+        <footer className="entry-footer mt-3">
+          <SocialIcons />
+        </footer>
+      </article>
+
+      {/* Post list */}
+      <section className="post-list flex flex-col gap-(--content-gap)">
+        {posts.map((post) => {
+          const cover = post.frontmatter.cover?.image;
+          return (
+            <article
+              key={post.slug}
+              className="post-entry relative rounded-(--radius) border border-[color:var(--border)] bg-[color:var(--entry)] p-(--gap) hover:shadow-md transition-shadow"
+            >
+              {cover && (
+                <figure className="entry-cover mb-3">
+                  <Image
+                    src={cover}
+                    alt=""
+                    width={1200}
+                    height={630}
+                    className="rounded-(--radius) w-full h-auto"
+                    loading="lazy"
+                    unoptimized
+                  />
+                </figure>
+              )}
+              <header className="entry-header">
+                <h2 className="text-2xl font-bold">{post.frontmatter.title}</h2>
+              </header>
+              {post.frontmatter.summary && (
+                <div className="entry-content mt-2 text-[color:var(--content)]">
+                  {post.frontmatter.summary}
+                </div>
+              )}
+              <footer className="entry-footer mt-3 text-sm text-[color:var(--secondary)]">
+                <span>{formatDate(post.frontmatter.date)}</span>
+                {post.frontmatter.date && <span>&nbsp;·&nbsp;</span>}
+                <span>{siteConfig.author}</span>
+              </footer>
+              {/* Whole-card link, à la PaperMod's `.entry-link` */}
+              <Link
+                href={`/posts/${post.slug}/`}
+                aria-label={`post link to ${post.frontmatter.title}`}
+                className="absolute inset-0"
+              />
+            </article>
+          );
+        })}
+      </section>
+    </>
   );
 }
