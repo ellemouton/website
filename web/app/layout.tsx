@@ -39,6 +39,13 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [OG_IMAGE],
   },
+  // RSS feed autodiscovery — emits <link rel="alternate" type="application/rss+xml">
+  // so feed readers and browser extensions surface a subscribe affordance.
+  alternates: {
+    types: {
+      "application/rss+xml": [{ url: "/index.xml", title: siteConfig.title }],
+    },
+  },
 };
 
 export default function RootLayout({
