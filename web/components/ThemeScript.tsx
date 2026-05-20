@@ -17,5 +17,15 @@ export function ThemeScript() {
 })();
 `.trim();
 
-  return <script dangerouslySetInnerHTML={{ __html: code }} />;
+  // suppressHydrationWarning: some browser extensions mutate inline
+  // <script> tags before React hydrates (e.g. ad-blockers injecting a
+  // `src` attribute). React then sees a mismatch and warns. Since this
+  // script's job is over by the time hydration runs, the diff doesn't
+  // matter — just tell React to skip it.
+  return (
+    <script
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: code }}
+    />
+  );
 }

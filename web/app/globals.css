@@ -166,8 +166,37 @@ a {
     height: auto;
 }
 
-/* Content width matches PaperMod's 720px — same on every page now that
- * About no longer needs the wider sidebar layout. */
+/* Content width matches PaperMod's 720px on post pages — narrow column
+ * is comfortable for long-form reading. About widens to fit the sticky
+ * ToC sidebar + main content side-by-side. */
 .main {
     max-width: calc(var(--main-width) + var(--gap) * 2);
+}
+
+.main:has(.about-page) {
+    max-width: calc(900px + var(--gap) * 2);
+}
+
+/* About-sidebar ToC: the dash on the left of each entry extends on
+ * hover, à la tamir.io. Keeping the animation on a span with a
+ * transitioning width gives smooth, GPU-friendly motion. */
+.toc-link .toc-dash {
+    width: 14px;
+}
+.toc-link:hover .toc-dash {
+    width: 28px;
+}
+
+/* Theme-toggle icon visibility: which SVG is rendered depends solely on
+ * the `dark` class that ThemeScript sets pre-hydration. Both SVGs ship
+ * with the button so the icon is correct even if hydration is slow or
+ * skipped. */
+.theme-toggle .theme-toggle-sun {
+    display: none;
+}
+.dark .theme-toggle .theme-toggle-moon {
+    display: none;
+}
+.dark .theme-toggle .theme-toggle-sun {
+    display: inline-block;
 }
