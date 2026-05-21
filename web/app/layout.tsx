@@ -9,7 +9,9 @@ import { siteConfig } from "@/lib/site-config";
 // etc.) show as the thumbnail when this link is shared. Put a 1200x630 PNG
 // at /static/og-image.png and the metadata below will reference it on every
 // page that doesn't override `openGraph.images` itself.
-const OG_IMAGE = "/og-image.png";
+// JPG (not PNG): the photo compresses ~6x smaller as JPG than PNG, and
+// OG validators (notably LinkedIn) flag images > ~1 MB.
+const OG_IMAGE = "/og-image.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ellemouton.com"),
