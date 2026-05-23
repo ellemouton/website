@@ -143,7 +143,7 @@ export function AboutContent() {
         <h2 id="about">About</h2>
         <p>
           Backend engineer with 5+ years building production-scale
-          distributed systems in Go. My work spans event-driven microservices
+          distributed systems. My work spans event-driven microservices
           serving millions of users and protocol-level upgrades to large,
           live peer-to-peer networks. I thrive in small, fast-moving teams
           with high ownership and high engineering standards.
