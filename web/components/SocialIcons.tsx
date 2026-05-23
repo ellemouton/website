@@ -51,7 +51,7 @@ export function SocialIcons() {
           <a
             key={s.name}
             href={s.url}
-            target={s.name === "email" || s.name === "rss" ? undefined : "_blank"}
+            target={s.name === "rss" ? undefined : "_blank"}
             rel="noopener noreferrer"
             aria-label={s.name}
             title={s.name}
