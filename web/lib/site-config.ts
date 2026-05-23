@@ -18,6 +18,7 @@ export const siteConfig = {
   // than linking to a dead page.
   menu: [
     { name: "About", href: "/about/" },
+    { name: "Articles", href: "/articles/" },
     { name: "CV", href: "/CV_Elle_Mouton.pdf" },
     { name: "Archive", href: "/archives/" },
   ],
