@@ -260,3 +260,13 @@ a {
 .dark .theme-toggle .theme-toggle-sun {
     display: inline-block;
 }
+
+/* About-page blog carousel: hide the native scrollbar so the strip
+ * looks like an album, while keeping wheel/touch/keyboard scrolling
+ * fully functional. */
+.post-carousel {
+    scrollbar-width: none; /* Firefox */
+}
+.post-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}

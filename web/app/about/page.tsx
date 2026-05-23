@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { PostCarousel } from "@/components/PostCarousel";
 
 export const metadata: Metadata = {
   title: "About",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 // names under Work) are intentionally omitted to keep the rail tidy.
 const TOC = [
   { label: "About", href: "#about" },
+  { label: "Writing", href: "#writing" },
   { label: "Work", href: "#work" },
   { label: "Public Appearances", href: "#public-appearances" },
 ];
@@ -28,7 +30,7 @@ function DateRange({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
   return (
     <article className="about-page grid gap-10 md:grid-cols-[140px_1fr]">
       <aside className="about-sidebar md:sticky md:top-20 md:self-start text-sm">
@@ -56,7 +58,7 @@ export default function AboutPage() {
         </nav>
       </aside>
 
-      <div className="post-content space-y-2">
+      <div className="post-content space-y-2 min-w-0">
         <h2 id="about">About</h2>
         <p>
           I&rsquo;m a Software engineer with 5+ years building production-scale distributed
@@ -72,6 +74,16 @@ export default function AboutPage() {
           You can grab my CV{" "}
           <Link href="/CV_Elle_Mouton.pdf">here</Link>.
         </p>
+
+        <hr className="my-12 border-[color:var(--border)]" />
+
+        <h2 id="writing">Writing</h2>
+        <p>
+          I write deep-dive technical posts on Bitcoin and Lightning Network
+          internals. Scroll through, or head to the{" "}
+          <Link href="/">home page</Link> for the full list.
+        </p>
+        <PostCarousel />
 
         <hr className="my-12 border-[color:var(--border)]" />
 
