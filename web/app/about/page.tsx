@@ -172,7 +172,7 @@ export default async function AboutPage() {
               marginRight: "0.5em",
             }}
           />
-          Lightning Labs: Lightning Infrastructure Engineer
+          Lightning Infrastructure Engineer | Lightning Labs
         </h3>
         <DateRange>2021 to Present</DateRange>
         <p>
@@ -207,7 +207,7 @@ export default async function AboutPage() {
               marginRight: "0.5em",
             }}
           />
-          Luno: Graduate Software Engineer
+          Software Engineer | Luno
         </h3>
         <DateRange>2020 to 2021</DateRange>
         <p>
