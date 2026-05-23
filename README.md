@@ -6,18 +6,20 @@ and Lightning Network internals, plus an about page and CV. Live at
 
 ## Layout
 
-The site was originally a Hugo build and is currently being migrated
-to Next.js. Both live in this repo:
+The site was originally a Hugo build. The Hugo scaffolding has been
+removed; only two directories carried over still matter:
 
-- `web/` — the active Next.js app (App Router, React 19, Tailwind v4).
-  This is what Vercel builds and serves.
+- `web/` — the Next.js app (App Router, React 19, Tailwind v4). This
+  is what Vercel builds and serves.
 - `content/posts/*.md` — the canonical markdown source for every blog
-  post. The Next.js app reads from here directly.
-- `static/img/`, `static/og-image.jpg`, `config.yml`, `themes/`,
-  `archetypes/`, `layouts/` — legacy Hugo files. The image directory
-  is hardlinked to `web/public/img/` so the Next.js app sees the same
-  files. The other Hugo files aren't deployed; they're kept for now
-  in case the old build is needed for comparison.
+  post. The Next.js app reads from here directly via
+  `web/lib/posts.ts`.
+- `static/` — all static assets (per-post image directories, OG card,
+  CV, favicons, the `img/` folder for site-chrome images, etc.).
+  `web/public` is a **symlink to `../static`**, so Next.js serves
+  everything in here at the root path (`/og-image.jpg`,
+  `/CV_Elle_Mouton.pdf`, `/img/...`, `/bip158/...`, etc.). Drop new
+  static files into `static/` and they're immediately available.
 
 ## Running locally
 
