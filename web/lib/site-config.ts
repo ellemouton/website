@@ -1,16 +1,11 @@
 // Single source of truth for site-wide constants (title, author,
-// navigation, social links). Mirrors the relevant subset of the Hugo
-// config.yml at the repo root so a Hugo/Next.js A/B comparison reads
-// the same content.
+// navigation, social links).
 
 export const siteConfig = {
   title: "Elle Mouton",
   description:
-    "Welcome! Here you'll find deep dives into Bitcoin and Lightning Network protocols.",
+    "Backend engineer in San Francisco. 5+ years building distributed systems, from event-driven microservices to protocol-level work on live peer-to-peer networks.",
   author: "Elle Mouton",
-  homeTitle: "Layer by Layer",
-  homeContent:
-    "Welcome! Here you'll find deep dives into Bitcoin and Lightning Network protocols. New here? Start with the [about page](/about/).",
 
   // Header menu items, ordered. Mirrors config.yml's `menu.main` minus
   // "Search" — search is a deferred feature (needs a client-side index
