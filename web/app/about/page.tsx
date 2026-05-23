@@ -15,6 +15,55 @@ const TOC = [
   { label: "Public Appearances", href: "#public-appearances" },
 ];
 
+// Public Appearances grid data. Card images live in /public/img/.
+// Aspect ratios vary; cards normalise to 16:10 via object-fit: cover.
+const APPEARANCES = [
+  {
+    source: "The Chaincode Podcast",
+    year: "2023",
+    description: "Simple Taproot Channels on the Lightning Network.",
+    href: "https://podcast.chaincode.com/2023/07/17/elle-oli-taproot-channels",
+    image: "/img/chaincode.png",
+  },
+  {
+    source: "Advancing Bitcoin Conference, London",
+    year: "2022",
+    description: "Static invoices on the Lightning Network.",
+    href: "https://vimeo.com/703262308",
+    image: "/img/advancing-bitcoin.png",
+  },
+  {
+    source: "Connect The World Podcast",
+    year: "2022",
+    description: "All things Lightning.",
+    href: "https://www.youtube.com/watch?v=tF75BaqsJ3g",
+    image: "/img/connect-the-world.png",
+  },
+  {
+    source: "Bitcoin Optech Podcast",
+    year: "Oct 2024",
+    description:
+      "Proposed updates to the Lightning gossip protocol (start at 1m35s).",
+    href: "https://bitcoinops.org/en/podcast/2024/10/29/",
+    image: "/img/bitcoin-optech.png",
+  },
+  {
+    source: "Bitcoin Optech Podcast",
+    year: "Jul 2024",
+    description:
+      "Adding a BOLT11 invoice field for blinded paths (start at 22m17s).",
+    href: "https://bitcoinops.org/en/podcast/2024/07/09/#adding-a-bolt11-invoice-field-for-blinded-paths",
+    image: "/img/bitcoin-optech.png",
+  },
+  {
+    source: "Bitcoin++ Brazil",
+    year: "2025",
+    description: "Technical hackathon judge (one of four).",
+    href: "https://btcplusplus.dev/floripa",
+    image: "/img/bitcoinplusplus.png",
+  },
+];
+
 // Reusable muted-grey label for things like date ranges — kept as a small
 // helper so the same treatment applies consistently and we don't have
 // `<em>` lying around pretending to mark up metadata.
@@ -148,48 +197,43 @@ export default async function AboutPage() {
         <hr className="my-12 border-[color:var(--border)]" />
 
         <h2 id="public-appearances">Public Appearances</h2>
-        <ul>
-          <li>
-            <a href="https://podcast.chaincode.com/2023/07/17/elle-oli-taproot-channels">
-              <strong>The Chaincode Podcast</strong>
-            </a>{" "}
-            <span style={{ color: "var(--secondary)" }}>(2023)</span>: Simple
-            Taproot Channels on the Lightning Network.
-          </li>
-          <li>
-            <a href="https://vimeo.com/703262308">
-              <strong>Advancing Bitcoin Conference</strong>, London
-            </a>{" "}
-            <span style={{ color: "var(--secondary)" }}>(2022)</span>: Static
-            invoices on the Lightning Network.
-          </li>
-          <li>
-            <a href="https://www.youtube.com/watch?v=tF75BaqsJ3g">
-              <strong>Connect The World Podcast</strong>
-            </a>{" "}
-            <span style={{ color: "var(--secondary)" }}>(2022)</span>: All
-            things Lightning.
-          </li>
-          <li>
-            <a href="https://bitcoinops.org/en/podcast/2024/10/29/">
-              <strong>Bitcoin Optech Podcast</strong>
-            </a>{" "}
-            <span style={{ color: "var(--secondary)" }}>(Oct 2024)</span>:
-            Proposed updates to the Lightning gossip protocol (start at 1m35s).
-          </li>
-          <li>
-            <a href="https://bitcoinops.org/en/podcast/2024/07/09/#adding-a-bolt11-invoice-field-for-blinded-paths">
-              <strong>Bitcoin Optech Podcast</strong>
-            </a>{" "}
-            <span style={{ color: "var(--secondary)" }}>(Jul 2024)</span>:
-            Adding a BOLT11 invoice field for blinded paths (start at 22m17s).
-          </li>
-          <li>
-            <strong>Bitcoin++ Brazil</strong>{" "}
-            <span style={{ color: "var(--secondary)" }}>(2025)</span>:
-            Technical hackathon judge (one of four).
-          </li>
-        </ul>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {APPEARANCES.map((a) => (
+            <a
+              key={a.href}
+              href={a.href}
+              className="appearance-card group flex flex-col overflow-hidden rounded-(--radius) border border-[color:var(--border)] bg-[color:var(--entry)] no-underline transition-shadow hover:shadow-md"
+            >
+              <div
+                className="w-full overflow-hidden bg-[color:var(--tertiary)]"
+                style={{ aspectRatio: "16 / 10" }}
+              >
+                <Image
+                  src={a.image}
+                  alt=""
+                  width={1024}
+                  height={640}
+                  unoptimized
+                  className="transition-transform duration-300 group-hover:scale-[1.03]"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+              <div className="flex flex-col gap-1 p-3">
+                <p className="text-sm font-semibold text-[color:var(--content)]">
+                  {a.source}{" "}
+                  <span style={{ color: "var(--secondary)" }}>({a.year})</span>
+                </p>
+                <p className="text-sm text-[color:var(--secondary)]">
+                  {a.description}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </article>
   );

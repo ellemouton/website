@@ -270,3 +270,16 @@ a {
 .post-carousel::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge */
 }
+
+/* Public Appearances cards: opt out of the global .post-content a
+ * underline-via-box-shadow + secondary-grey colour. Cards carry their
+ * own visual treatment (border + hover shadow) and the inner text
+ * should keep its own colours. */
+.appearance-card {
+    color: inherit;
+    box-shadow: none;
+}
+.appearance-card:hover {
+    color: inherit;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
