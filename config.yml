@@ -75,8 +75,6 @@ params:
         url: "https://www.instagram.com/ellemouton"
       - name: linkedin
         url: "https://www.linkedin.com/in/elle-mouton-50635a143/"
-      - name: email
-        url: "mailto://elle@lightning.engineering"
       - name: "rss"
         url: "https://www.ellemouton.com/index.xml"
 
