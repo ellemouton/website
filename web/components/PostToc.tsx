@@ -68,7 +68,7 @@ export function PostToc({ html }: { html: string }) {
 
   return (
     <div className="toc">
-      <details open>
+      <details>
         <summary>
           <span className="details">Table of Contents</span>
         </summary>
