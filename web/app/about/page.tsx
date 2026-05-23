@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { PostCarousel } from "@/components/PostCarousel";
 
 export const metadata: Metadata = {
@@ -61,18 +60,16 @@ export default async function AboutPage() {
       <div className="post-content space-y-2 min-w-0">
         <h2 id="about">About</h2>
         <p>
-          I&rsquo;m a Software engineer with 5+ years building production-scale distributed
-          systems in Go, from high-volume financial microservices serving
-          millions of users to LND, the most widely deployed Lightning Network
-          (Bitcoin L2) implementation, operating across ~16k nodes and ~50k
-          payment channels, to which I&rsquo;m a top open-source contributor. I
-          thrive in small, fast-moving teams with high ownership and high
-          engineering standards.
+          Backend engineer with 5+ years building production-scale
+          distributed systems in Go. My work spans event-driven microservices
+          serving millions of users and protocol-level upgrades to large,
+          live peer-to-peer networks. I thrive in small, fast-moving teams
+          with high ownership and high engineering standards.
         </p>
 
         <p>
-          You can grab my CV{" "}
-          <Link href="/CV_Elle_Mouton.pdf">here</Link>.
+          I&rsquo;m especially interested in developer tools, AI, data
+          pipelines, and event-driven systems.
         </p>
 
         <hr className="my-12 border-[color:var(--border)]" />
@@ -80,8 +77,10 @@ export default async function AboutPage() {
         <h2 id="writing">Writing</h2>
         <p>
           I write deep-dive technical posts on Bitcoin and Lightning Network
-          internals. Scroll through, or head to the{" "}
-          <Link href="/">home page</Link> for the full list.
+          internals. They&rsquo;ve been well received across the community
+          and have helped many engineers understand some of Lightning&rsquo;s
+          most complex inner workings. Breaking dense protocols and systems
+          down into approachable pieces is something I genuinely enjoy.
         </p>
         <PostCarousel />
 
@@ -106,44 +105,22 @@ export default async function AboutPage() {
         </h3>
         <DateRange>2021 to Present</DateRange>
         <p>
-          I joined Lightning Labs in 2021 after deciding in my final year of
-          university that protocol work was what I wanted to do, and moved
-          onto the Lightning Network protocol team itself at the end of 2023.
-          Today my work splits across two areas:
-        </p>
-        <ul>
-          <li>
-            <strong>
-              Lightning Network protocol &amp; LND (Lightning Network Daemon).
-            </strong>{" "}
-            Contributions and proposals to the Lightning Network specification,
-            plus implementation and review work across LND, the most
-            widely-used Lightning implementation. I&rsquo;m one of the top
-            contributors to the{" "}
-            <a href="https://github.com/lightningnetwork/lnd/graphs/contributors">
-              LND repository
-            </a>
-            , and have also led significant optimisations to the Neutrino
-            Bitcoin light-client sync process.
-          </li>
-          <li>
-            <strong>Lightning Terminal &amp; Lightning Node Connect.</strong>{" "}
-            Led major features across the{" "}
-            <a href="https://github.com/lightninglabs/lightning-terminal/graphs/contributors">
-              Lightning Terminal
-            </a>{" "}
-            daemon and the{" "}
-            <a href="https://github.com/lightninglabs/lightning-node-connect/graphs/contributors">
-              Lightning Node Connect
-            </a>{" "}
-            protocol, where I&rsquo;m a top contributor to both.
-          </li>
-        </ul>
-        <p>
-          Beyond shipping code, this work involves deep collaboration with the
-          broader open-source Lightning community: code review, mailing-list
-          spec discussions, and the last three Lightning Protocol Summits
-          (Tokyo 2024, New York City 2023, San Francisco 2022).
+          One of the top contributors to{" "}
+          <a href="https://github.com/lightningnetwork/lnd/graphs/contributors">
+            LND
+          </a>
+          , the most widely-deployed Lightning Network implementation. My
+          work centres on shipping protocol upgrades and large database
+          migrations safely across a live peer-to-peer network of thousands
+          of nodes. I also lead major features in the{" "}
+          <a href="https://github.com/lightninglabs/lightning-terminal/graphs/contributors">
+            Lightning Terminal
+          </a>{" "}
+          and{" "}
+          <a href="https://github.com/lightninglabs/lightning-node-connect/graphs/contributors">
+            Lightning Node Connect
+          </a>{" "}
+          developer tooling.
         </p>
 
         <h3 id="luno">
@@ -163,11 +140,9 @@ export default async function AboutPage() {
         </h3>
         <DateRange>2020 to 2021</DateRange>
         <p>
-          Backend engineer on the crypto-operations team, working in Go on
-          gRPC microservices that handled high cryptocurrency volumes for
-          millions of users. This is where I built up production Go
-          experience, got comfortable inside distributed systems, and shipped
-          through CI/CD pipelines into a real, high-load environment.
+          Backend engineer on the crypto-operations team. Worked in Go on
+          event-driven microservices handling high cryptocurrency volumes
+          for millions of users.
         </p>
 
         <hr className="my-12 border-[color:var(--border)]" />
