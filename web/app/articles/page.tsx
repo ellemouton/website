@@ -23,11 +23,19 @@ export default async function ArticlesPage() {
 
   return (
     <>
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold">Articles</h1>
-        <p className="mt-3 text-[color:var(--secondary)]">
-          Deep dives into Bitcoin and Lightning Network protocols.
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-4xl font-extrabold">Articles</h1>
+          <p className="mt-3 text-[color:var(--secondary)]">
+            Deep dives into Bitcoin and Lightning Network protocols.
+          </p>
+        </div>
+        <Link
+          href="/archives/"
+          className="inline-flex items-center rounded-(--radius) border border-[color:var(--border)] bg-[color:var(--entry)] px-3 py-1.5 text-sm hover:bg-[color:var(--tertiary)]"
+        >
+          View archive &rarr;
+        </Link>
       </header>
 
       <section className="post-list flex flex-col gap-(--content-gap)">

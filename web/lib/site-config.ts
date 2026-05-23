@@ -20,7 +20,6 @@ export const siteConfig = {
     { name: "About", href: "/about/" },
     { name: "Articles", href: "/articles/" },
     { name: "CV", href: "/CV_Elle_Mouton.pdf" },
-    { name: "Archive", href: "/archives/" },
   ],
 
   social: [
