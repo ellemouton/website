@@ -82,6 +82,28 @@ export default async function AboutPage() {
   return (
     <article className="about-page grid gap-10 md:grid-cols-[140px_1fr]">
       <aside className="about-sidebar md:sticky md:top-20 md:self-start text-sm">
+        {/* Profile photo: the same image used as the site's OG card.
+         * Rendered as a circular avatar — object-cover crops the wide
+         * 1200x630 image down to its centre square, which is the
+         * portrait portion. */}
+        <div
+          className="mb-6 overflow-hidden rounded-full border border-[color:var(--border)]"
+          style={{ width: 120, height: 120, aspectRatio: "1 / 1" }}
+        >
+          <Image
+            src="/og-image.jpg"
+            alt="Elle Mouton"
+            width={630}
+            height={630}
+            unoptimized
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "85% 50%",
+            }}
+          />
+        </div>
         <nav>
           <ul className="list-none p-0 m-0 flex flex-col gap-3">
             {TOC.map((item) => (
