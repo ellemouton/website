@@ -112,6 +112,9 @@ export function AboutContent() {
             }}
           />
         </div>
+        <p className="mt-4 text-xs italic text-[color:var(--secondary)]">
+          📍 Based in San Francisco
+        </p>
         <nav className="mt-6">
           <ul className="list-none p-0 m-0 flex flex-col gap-3">
             {TOC.map((item) => (
@@ -150,19 +153,18 @@ export function AboutContent() {
         </p>
 
         <p>
-          I&rsquo;m especially interested in developer tools, AI, data
-          pipelines, and event-driven systems.
+          I&rsquo;m especially interested in developer tools, AI, and
+          event-driven systems.
         </p>
 
         <hr className="my-12 border-[color:var(--border)]" />
 
         <h2 id="writing">Writing</h2>
         <p>
-          I write deep-dive technical posts on Bitcoin and Lightning Network
-          internals. They&rsquo;ve been well received across the community
-          and have helped many engineers understand some of Lightning&rsquo;s
-          most complex inner workings. Breaking dense protocols and systems
-          down into approachable pieces is something I genuinely enjoy.
+          I love breaking down dense protocols and systems into approachable
+          pieces. My deep-dive technical posts on Bitcoin and Lightning
+          Network internals have been widely read and well received across
+          the community.
         </p>
         <PostCarousel />
         <p className="mt-2 text-sm">
@@ -191,7 +193,7 @@ export function AboutContent() {
         <DateRange>2021 to Present</DateRange>
         <p>
           One of the top contributors to{" "}
-          <a href="https://github.com/lightningnetwork/lnd/graphs/contributors">
+          <a href="https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024">
             LND
           </a>
           , the most widely-deployed Lightning Network implementation. My
