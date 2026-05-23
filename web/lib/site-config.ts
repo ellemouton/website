@@ -28,7 +28,6 @@ export const siteConfig = {
     { name: "keybase", url: "https://keybase.io/ellemo" },
     { name: "instagram", url: "https://www.instagram.com/ellemouton" },
     { name: "linkedin", url: "https://www.linkedin.com/in/elle-mouton-50635a143/" },
-    { name: "email", url: "mailto:elle@lightning.engineering" },
     { name: "rss", url: "/index.xml" },
   ],
 } as const;
