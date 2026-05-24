@@ -193,18 +193,30 @@ export function AboutContent() {
         <DateRange>2021 to Present</DateRange>
         <p>
           One of the top contributors to{" "}
-          <a href="https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024">
+          <a
+            href="https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             LND
           </a>
           , the most widely-deployed Lightning Network implementation. My
           work centres on shipping protocol upgrades and large database
           migrations safely across a live peer-to-peer network of thousands
           of nodes. I also lead major features in the{" "}
-          <a href="https://github.com/lightninglabs/lightning-terminal/graphs/contributors">
+          <a
+            href="https://github.com/lightninglabs/lightning-terminal/graphs/contributors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Lightning Terminal
           </a>{" "}
           and{" "}
-          <a href="https://github.com/lightninglabs/lightning-node-connect/graphs/contributors">
+          <a
+            href="https://github.com/lightninglabs/lightning-node-connect/graphs/contributors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Lightning Node Connect
           </a>{" "}
           developer tooling.
@@ -240,6 +252,8 @@ export function AboutContent() {
             <a
               key={a.href}
               href={a.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="appearance-card group flex flex-col overflow-hidden rounded-(--radius) border border-[color:var(--border)] bg-[color:var(--entry)] no-underline transition-shadow hover:shadow-md"
             >
               <div
