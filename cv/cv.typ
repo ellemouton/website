@@ -64,11 +64,11 @@
 ]
 
 #let main-h(body) = block(spacing: 0pt)[
-  #set text(fill: navy, size: 17pt, weight: "bold", tracking: 0.5pt)
+  #set text(fill: navy, size: 15pt, weight: "bold", tracking: 0.5pt)
   #upper(body)
   #v(3pt)
   #line(length: 100%, stroke: 0.6pt + accent)
-  #v(7pt)
+  #v(4pt)
 ]
 
 #let sidebar-row(icon, value, url: none) = {
@@ -133,8 +133,6 @@
     ]
     #block(inset: (x: 6pt, y: 5pt), spacing: 0pt)[
       #text(weight: "bold", size: 8pt, fill: navy)[#title]
-      #h(2pt)
-      #text(size: 7.5pt, fill: muted)[(#year)]
     ]
   ]
 ]
@@ -166,7 +164,7 @@
         image("avatar.jpg", width: 130pt, height: 130pt, fit: "cover"),
       )
     ]
-    #v(10pt)
+    #v(16pt)
     #align(center)[
       #text(size: 9pt, style: "italic", fill: onNavyMuted)[
         Based in San Francisco
@@ -199,7 +197,7 @@
       #text(fill: onNavyMuted, size: 8.5pt, style: "italic")[
         2016 – 2019 · University of Cape Town
       ]
-      #v(10pt)
+      #v(16pt)
       #grid(
         columns: (6pt, 1fr),
         column-gutter: 8pt,
@@ -224,8 +222,20 @@
 
       #skill-label[Domains]
       #v(8pt)
-      Distributed systems · P2P networks · protocol design · database
-      migrations · code review at scale
+      Distributed systems · P2P networks · event-driven systems &
+      pipelines · protocol design · database migrations · code review
+      at scale
+      #v(16pt)
+
+      #skill-label[Agentic Workflows]
+      #v(8pt)
+      Daily use of local parallel coding agents (Codex, Claude) ·
+      designing features and steering agents through implementation
+    ]
+
+    #v(26pt)
+    #text(size: 8.5pt, style: "italic", fill: onNavyMuted)[
+      Contact me for references.
     ]
   ],
 
@@ -240,18 +250,25 @@
       #v(6pt)
       #line(length: 72pt, stroke: 1pt + accent)
     ]
-    #v(10pt)
+    #v(16pt)
 
     #main-h[About]
-    Backend engineer with 5+ years building production-scale
+    I am a backend engineer with 5+ years building production-scale
     distributed systems. My work spans event-driven microservices
     serving millions of users and protocol-level upgrades to large,
     live peer-to-peer networks. I thrive in small, fast-moving teams
     with high ownership and high engineering standards.
     #v(7pt)
-    Especially interested in developer tools, AI, and event-driven
-    systems.
-    #v(20pt)
+    I'm especially interested in agentic loops, building experiences,
+    flows, and tools for both developers and non-developers, AI, and
+    event-driven systems.
+    #v(7pt)
+    #text(style: "italic", fill: muted)[
+      Outside of work, you can find me in the mountains, looking for
+      rocks to climb, photo hunting, practicing calisthenics, or
+      spending time with friends.
+    ]
+    #v(16pt)
 
     #main-h[Experience]
     #job(
@@ -264,8 +281,9 @@
       Lightning Network implementation. My work centres on shipping
       protocol upgrades and large database migrations safely across a
       live peer-to-peer network of thousands of nodes. I also lead
-      major features in the Lightning Terminal and Lightning Node
-      Connect developer-tooling projects.
+      major features in the #link("https://github.com/lightninglabs/lightning-terminal")[#text(fill: accent)[#underline[Lightning Terminal]]]
+      and #link("https://github.com/lightninglabs/lightning-node-connect")[#text(fill: accent)[#underline[Lightning Node Connect]]]
+      developer-tooling projects.
 
       #v(4pt)
       #bullet[
@@ -292,6 +310,13 @@
       for millions of users.
     ]
 
+    #v(6pt)
+    #main-h[Writing]
+    Deep-dive technical posts on Bitcoin and Lightning Network
+    internals, widely read across the community.
+    #link("https://www.ellemouton.com/articles/")[ #text(fill: accent, weight: "bold")[#underline[ellemouton.com/articles] →]]
+
+    #v(20pt)
     #main-h[Public Appearances]
     #grid(
       columns: (1fr, 1fr, 1fr),
@@ -340,11 +365,5 @@
         "https://btcplusplus.dev/floripa",
       ),
     )
-
-    #v(8pt)
-    #main-h[Writing]
-    Deep-dive technical posts on Bitcoin and Lightning Network
-    internals, widely read across the community.
-    #link("https://www.ellemouton.com/articles/")[ #text(fill: accent, weight: "bold")[#underline[ellemouton.com/articles] →]]
   ],
 )
