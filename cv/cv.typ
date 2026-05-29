@@ -64,8 +64,8 @@
 ]
 
 #let main-h(body) = block(spacing: 0pt)[
-  #set text(fill: navy, size: 15pt, weight: "bold", tracking: 0.5pt)
-  #upper(body)
+  #set text(fill: navy, size: 17pt, weight: "semibold", tracking: 0pt)
+  #body
   #v(3pt)
   #line(length: 100%, stroke: 0.6pt + accent)
   #v(4pt)
