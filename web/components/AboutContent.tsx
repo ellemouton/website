@@ -153,8 +153,21 @@ export function AboutContent() {
         </p>
 
         <p>
-          I&rsquo;m especially interested in developer tools, AI, and
-          event-driven systems.
+          I&rsquo;m especially interested in agentic loops, building
+          experiences, flows, and tools for both developers and
+          non-developers, AI, and event-driven systems.
+        </p>
+
+        <p>
+          Day-to-day I work with local parallel coding agents
+          (Codex, Claude) &mdash; designing features and steering
+          agents through implementation.
+        </p>
+
+        <p>
+          Outside of work, you can find me in the mountains, looking
+          for rocks to climb, photo hunting, practicing calisthenics,
+          or spending time with friends.
         </p>
 
         <hr className="my-12 border-[color:var(--border)]" />
@@ -192,9 +205,9 @@ export function AboutContent() {
         </h3>
         <DateRange>2021 to Present</DateRange>
         <p>
-          One of the top contributors to{" "}
+          Top contributor to{" "}
           <a
-            href="https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024"
+            href="https://github.com/lightningnetwork/lnd/graphs/contributors?all=1"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -221,6 +234,76 @@ export function AboutContent() {
           </a>{" "}
           developer tooling.
         </p>
+        <p>Selected highlights:</p>
+        <ul>
+          <li>
+            <strong>LND graph SQL migration</strong> &mdash; leading the
+            multi-PR{" "}
+            <a
+              href="https://github.com/lightningnetwork/lnd/issues/9795"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              epic
+            </a>{" "}
+            moving LND&rsquo;s graph database to SQL. One batch-fetching
+            rework took <code>ForEachNodeCached</code> on a mainnet graph
+            from 276s to 10s (
+            <a
+              href="https://github.com/lightningnetwork/lnd/pull/10123"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ~28&times; speedup
+            </a>
+            ).
+          </li>
+          <li>
+            <strong>
+              <a
+                href="https://github.com/lightninglabs/neutrino/graphs/contributors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Neutrino
+              </a>{" "}
+              sync
+            </strong>{" "}
+            &mdash; batched filter fetching took a 3,200-filter regtest
+            sync from 4m25s to 653ms (
+            <a
+              href="https://github.com/lightninglabs/neutrino/pull/275"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ~400&times; speedup
+            </a>
+            ).
+          </li>
+          <li>
+            <strong>BOLT11 blinded paths</strong> &mdash; drove{" "}
+            <a
+              href="https://github.com/lightning/blips/pull/39"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              BLIP-0039
+            </a>
+            , the BOLT11 invoice blinded-path tagged field.
+          </li>
+          <li>
+            <strong>Network gossip protocol upgrade</strong> &mdash;
+            authored the{" "}
+            <a
+              href="https://github.com/lightning/bolts/pull/1059"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              BOLT spec extension
+            </a>{" "}
+            upgrading the Lightning network graph gossip protocol.
+          </li>
+        </ul>
 
         <h3 id="luno">
           <Image
