@@ -235,6 +235,13 @@
 
     #v(26pt)
     #text(size: 8.5pt, style: "italic", fill: onNavyMuted)[
+      Outside of work, you can find me in the mountains, looking for
+      rocks to climb, photo hunting, practicing calisthenics, or
+      spending time with friends.
+    ]
+
+    #v(14pt)
+    #text(size: 8.5pt, style: "italic", fill: onNavyMuted)[
       Contact me for references.
     ]
   ],
@@ -262,12 +269,6 @@
     I'm especially interested in agentic loops, building experiences,
     flows, and tools for both developers and non-developers, AI, and
     event-driven systems.
-    #v(7pt)
-    #text(style: "italic", fill: muted)[
-      Outside of work, you can find me in the mountains, looking for
-      rocks to climb, photo hunting, practicing calisthenics, or
-      spending time with friends.
-    ]
     #v(16pt)
 
     #main-h[Experience]
@@ -277,25 +278,32 @@
       [Lightning Labs],
       [2021 – Present],
     )[
-      One of the top contributors to #link("https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024")[#text(fill: accent)[#underline[LND]]], the most widely-deployed
-      Lightning Network implementation. My work centres on shipping
-      protocol upgrades and large database migrations safely across a
-      live peer-to-peer network of thousands of nodes. I also lead
-      major features in the #link("https://github.com/lightninglabs/lightning-terminal")[#text(fill: accent)[#underline[Lightning Terminal]]]
-      and #link("https://github.com/lightninglabs/lightning-node-connect")[#text(fill: accent)[#underline[Lightning Node Connect]]]
-      developer-tooling projects.
-
-      #v(4pt)
       #bullet[
-        Contributions to the Lightning Network protocol specification.
+        Top contributor to
+        #link("https://github.com/lightningnetwork/lnd/graphs/contributors?all=1")[#text(fill: accent)[#underline[LND]]],
+        the most widely-deployed Bitcoin L2;
+        lead developer-tooling work on
+        #link("https://github.com/lightninglabs/lightning-node-connect/graphs/contributors")[#text(fill: accent)[#underline[Lightning Node Connect]]]
+        and
+        #link("https://github.com/lightninglabs/lightning-terminal")[#text(fill: accent)[#underline[Lightning Terminal]]].
       ]
       #bullet[
-        Significant optimisations to the Neutrino (Bitcoin light-client)
-        sync process.
+        Shipped protocol upgrades and large database migrations safely
+        across a live peer-to-peer network of thousands of nodes;
+        leading the multi-PR
+        #link("https://github.com/lightningnetwork/lnd/issues/9795")[#text(fill: accent)[#underline[epic]]]
+        moving LND's graph database to SQL.
       ]
       #bullet[
-        Extensive code review on a large, widely-used open-source
-        codebase.
+        Delivered significant performance improvements — e.g.
+        #link("https://github.com/lightningnetwork/lnd/pull/10123")[#text(fill: accent)[#underline[\~28× on a graph query]]]
+        and
+        #link("https://github.com/lightninglabs/neutrino/pull/275")[#text(fill: accent)[#underline[\~400× on a filter sync]]].
+      ]
+      #bullet[
+        Authored public protocol specification extensions
+        (#link("https://github.com/lightning/blips/pull/39")[#text(fill: accent)[#underline[BLIP-0039]]];
+        #link("https://github.com/lightning/bolts/pull/1059")[#text(fill: accent)[#underline[gossip protocol BOLT extension]]]).
       ]
     ]
 
