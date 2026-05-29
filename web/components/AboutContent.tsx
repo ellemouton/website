@@ -194,7 +194,7 @@ export function AboutContent() {
         <p>
           One of the top contributors to{" "}
           <a
-            href="https://github.com/lightningnetwork/lnd/graphs/contributors?from=18%2F05%2F2024"
+            href="https://github.com/lightningnetwork/lnd/graphs/contributors?all=1"
             target="_blank"
             rel="noopener noreferrer"
           >
