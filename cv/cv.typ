@@ -85,8 +85,13 @@
   if url != none { link(url, row) } else { row }
 }
 
-#let job(role, company, dates, body) = block(spacing: 14pt, breakable: false)[
+#let job(logo, role, company, dates, body) = block(spacing: 14pt, breakable: false)[
   #block(spacing: 0pt)[
+    #box(
+      baseline: 6pt,
+      image(logo, height: 16pt),
+    )
+    #h(6pt)
     #text(weight: "bold", size: 12pt, fill: navy)[#role]
     #h(6pt)
     #text(size: 11pt, fill: muted)[|]
@@ -108,20 +113,30 @@
   )
 ]
 
-#let appearance(title, desc, url) = block(spacing: 11pt, breakable: false)[
-  #grid(
-    columns: (10pt, 1fr),
-    column-gutter: 6pt,
-    row-gutter: 4pt,
-    text(fill: accent)[•],
-    [
-      #text(weight: "bold", fill: navy)[#title]
-      #h(6pt)
-      #link(url)[#text(fill: accent, size: 8.5pt)[#fa-link]]
-    ],
-    [],
-    text(fill: muted, size: 9.5pt)[#desc],
-  )
+// One appearance card: image + title + year. The whole card links out.
+#let appearance-card(image-path, title, year, desc, url) = link(url)[
+  #block(
+    breakable: false,
+    stroke: 0.5pt + rgb("#d9dee5"),
+    radius: 4pt,
+    inset: 0pt,
+    clip: true,
+    width: 100%,
+  )[
+    #box(
+      width: 100%,
+      height: 36pt,
+      clip: true,
+      fill: rgb("#eef1f5"),
+    )[
+      #image(image-path, width: 100%, height: 36pt, fit: "cover")
+    ]
+    #block(inset: (x: 6pt, y: 5pt), spacing: 0pt)[
+      #text(weight: "bold", size: 8pt, fill: navy)[#title]
+      #h(2pt)
+      #text(size: 7.5pt, fill: muted)[(#year)]
+    ]
+  ]
 ]
 
 // Small uppercase muted label used inside Skills.
@@ -190,7 +205,7 @@
         column-gutter: 8pt,
         row-gutter: 12pt,
         text(fill: accent)[•],
-        [Graduated with First Class Honours as top BSc(Eng) student.],
+        [Graduated with First Class Honours as the top BSc(Eng) student.],
         text(fill: accent)[•],
         [Awarded the prize for the best final-year thesis.],
       )
@@ -240,6 +255,7 @@
 
     #main-h[Experience]
     #job(
+      "img/lightning-labs.png",
       [Lightning Infrastructure Engineer],
       [Lightning Labs],
       [2021 – Present],
@@ -266,6 +282,7 @@
     ]
 
     #job(
+      "img/luno.png",
       [Software Engineer],
       [Luno],
       [2020 – 2021],
@@ -276,38 +293,55 @@
     ]
 
     #main-h[Public Appearances]
-    #appearance(
-      [Bitcoin++ Brazil (2025)],
-      [Technical hackathon judge.],
-      "https://btcplusplus.dev/floripa",
-    )
-    #appearance(
-      [Bitcoin Optech Podcast (Oct 2024)],
-      [Proposed updates to the Lightning gossip protocol.],
-      "https://bitcoinops.org/en/podcast/2024/10/29/",
-    )
-    #appearance(
-      [Bitcoin Optech Podcast (Jul 2024)],
-      [Adding a BOLT11 invoice field for blinded paths.],
-      "https://bitcoinops.org/en/podcast/2024/07/09/",
-    )
-    #appearance(
-      [The Chaincode Podcast (2023)],
-      [Simple Taproot Channels on the Lightning Network.],
-      "https://podcast.chaincode.com/2023/07/17/elle-oli-taproot-channels",
-    )
-    #appearance(
-      [Advancing Bitcoin Conference, London (2022)],
-      [Static invoices on the Lightning Network.],
-      "https://vimeo.com/703262308",
-    )
-    #appearance(
-      [Connect The World Podcast (2022)],
-      [All things Lightning.],
-      "https://www.youtube.com/watch?v=tF75BaqsJ3g",
+    #grid(
+      columns: (1fr, 1fr, 1fr),
+      column-gutter: 8pt,
+      row-gutter: 10pt,
+      appearance-card(
+        "img/advancing-bitcoin.png",
+        [Advancing Bitcoin, London],
+        [2022],
+        [Static invoices on the Lightning Network.],
+        "https://vimeo.com/703262308",
+      ),
+      appearance-card(
+        "img/connect-the-world.png",
+        [Connect The World Podcast],
+        [2022],
+        [All things Lightning.],
+        "https://www.youtube.com/watch?v=tF75BaqsJ3g",
+      ),
+      appearance-card(
+        "img/chaincode.png",
+        [The Chaincode Podcast],
+        [2023],
+        [Simple Taproot Channels on the Lightning Network.],
+        "https://podcast.chaincode.com/2023/07/17/elle-oli-taproot-channels",
+      ),
+      appearance-card(
+        "img/bitcoin-optech.png",
+        [Bitcoin Optech Podcast],
+        [Jul 2024],
+        [Adding a BOLT11 invoice field for blinded paths.],
+        "https://bitcoinops.org/en/podcast/2024/07/09/",
+      ),
+      appearance-card(
+        "img/bitcoin-optech.png",
+        [Bitcoin Optech Podcast],
+        [Oct 2024],
+        [Proposed updates to the Lightning gossip protocol.],
+        "https://bitcoinops.org/en/podcast/2024/10/29/",
+      ),
+      appearance-card(
+        "img/bitcoinplusplus.png",
+        [Bitcoin++ Brazil],
+        [2025],
+        [Technical hackathon judge.],
+        "https://btcplusplus.dev/floripa",
+      ),
     )
 
-    #v(6pt)
+    #v(8pt)
     #main-h[Writing]
     Deep-dive technical posts on Bitcoin and Lightning Network
     internals, widely read across the community.
