@@ -182,7 +182,7 @@
       #h(10pt)
       #link("https://github.com/ellemouton")[#fa-github]
       #h(10pt)
-      #link("https://www.linkedin.com/in/elle-mouton")[#fa-linkedin]
+      #link("https://www.linkedin.com/in/elle-mouton-50635a143/")[#fa-linkedin]
       #h(10pt)
       #link("https://instagram.com/ellemouton")[#fa-instagram]
     ]
