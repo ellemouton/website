@@ -16,6 +16,14 @@ export function Footer() {
         </a>
       </span>
       <span aria-hidden>·</span>
+      {/* Subtle cross-link to Elle's photography portfolio (separate site). */}
+      <a
+        href="https://photo.ellemouton.com"
+        className="hover:text-[color:var(--primary)]"
+      >
+        Photography
+      </a>
+      <span aria-hidden>·</span>
       <a
         href="https://github.com/ellemouton/website"
         target="_blank"
