@@ -10,14 +10,9 @@ cover:
     image: "/ark/cover.png"
 ---
 
-<!--
-Images: drop in static/ark/, reference as ![](/ark/<name>.png#center)
-Link refs at the bottom, [ref]: ../../posts/<slug> style.
--->
-
 # Forfeit Transactions and Connector Trees
 
-There are a few actions a VTXO owner might want to take that also involves
+There are a few actions a VTXO owner might want to take that also involve
 participating in a round.
 
 - **Leaving the Ark**
@@ -120,7 +115,7 @@ funds and leaving the user purely with the value of the new VTXO B.
 
 ![](/ark/forfeit-operator-claims.png#center)
 
-In the second scenario where the user has forfeit the VTXO A but the new batch
+In the second scenario where the user has forfeited the VTXO A but the new batch
 never makes it on-chain, the user continues to have full access to the VTXO since
 the forfeit transaction is meaningless without batch 100 being on-chain.
 
@@ -188,7 +183,7 @@ processing in this batch.
 
 Unrolling a connector works just like unrolling a VTXO. If the operator ever needs
 a particular connector on-chain, it broadcasts the chain of transactions running
-from the commitment transaction down to the leaf it wants: `ctx`, then `con1`,
+from the batch transaction down to the leaf it wants: `ctx`, then `con1`,
 then `con5`.
 
 ![](/ark/connector-unrolled.png#center)
@@ -200,17 +195,13 @@ value of the old VTXO across to the operator.
 
 ![](/ark/forfeit-tx-structure.png#center)
 
-
-[litepaper]: https://docs.arklabs.xyz/ark.pdf
-[arkade]: https://github.com/lightninglabs/ark
-
 ## Leave Requests
 
-Everything above used a batch swap as the example, but a leave request works in
+Everything above used a Batch Swap as the example, but a leave request works in
 exactly the same way. The only thing that changes is what the operator puts in the
 new batch transaction for you.
 
-In a batch swap you are given a fresh VTXO as a leaf of the new VTXT. In a leave
+In a Batch Swap you are given a fresh VTXO as a leaf of the new VTXT. In a leave
 request you are given a plain output on the batch transaction itself, paying you
 on-chain, and there is no restriction on the script you ask it to pay to.
 
@@ -219,3 +210,6 @@ transaction still spends that VTXO together with a connector leaf from the new
 batch transaction, and the same atomicity holds: if the batch transaction
 confirms then your coins are on-chain and the operator can claim the old VTXO,
 and if it never confirms then your old VTXO is still yours.
+
+[litepaper]: https://docs.arklabs.xyz/ark.pdf
+[arkade]: https://github.com/lightninglabs/ark
