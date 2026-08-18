@@ -134,18 +134,10 @@ is that all the outputs are fully owned by the operator.
 
 ![](/ark/why-connector-tree.png#center)
 
-Each leaf of the connector tree is one connector output, and there is exactly one
-leaf for every forfeit happening in this batch. When a user registers their
-forfeit, the operator hands them their own leaf along with the chain of virtual
-transactions proving that the leaf really does descend from the new batch
-transaction.
-
-![](/ark/connector-fanout.png#center)
-
-So a batch transaction ends up carrying two trees. The batch output pays to the
-VTXT holding everyone's new VTXOs, and the connector output pays to the connector
-tree holding the connectors for everyone's forfeits. Same construction, two very
-different jobs.
+Which means a batch transaction ends up carrying two trees. The batch output pays
+to the VTXT holding everyone's new VTXOs, and the connector output pays to the
+connector tree holding the connectors for everyone's forfeits. Same construction,
+two very different jobs.
 
 ![](/ark/batch-anatomy.png#center)
 
@@ -159,11 +151,18 @@ And the VTXOs being forfeited will generally be scattered across many different
 older batches: the chances of every VTXO in one tree being refreshed at the same
 time are slim, and nothing about the protocol requires it.
 
-Zooming in on the tree itself: every output in it is a plain dust output paying to
-the operator's key, <code>P<sub>o</sub></code>. That is the whole script. There is no sweep
-path and no timelock, because there is nothing here to protect against. The
-operator owns every output in this tree, from the root all the way down to the
-leaves, so there is nobody to race and nothing to reclaim.
+Now let's climb down into the connector tree itself. When a user registers their
+forfeit, the operator hands them one leaf of this tree along with the chain of
+virtual transactions proving that the leaf really does descend from the new batch
+transaction.
+
+![](/ark/connector-fanout.png#center)
+
+Every output in the tree is a plain dust output paying to the operator's key,
+<code>P<sub>o</sub></code>. That is the whole script. There is no sweep path and no
+timelock, because there is nothing here to protect against. The operator owns
+every output in this tree, from the root all the way down to the leaves, so there
+is nobody to race and nothing to reclaim.
 
 ![](/ark/connector-tree.png#center)
 
@@ -183,8 +182,8 @@ processing in this batch.
 
 Unrolling a connector works just like unrolling a VTXO. If the operator ever needs
 a particular connector on-chain, it broadcasts the chain of transactions running
-from the batch transaction down to the leaf it wants: `ctx`, then `con1`,
-then `con5`.
+from the batch transaction down to the leaf it wants: `ctx`, then `con1`, then
+`con5`.
 
 ![](/ark/connector-unrolled.png#center)
 
