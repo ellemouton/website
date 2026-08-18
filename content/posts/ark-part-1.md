@@ -134,6 +134,60 @@ forfeit occurring. Luckily, we can re-use the VTXT construction to house these
 outputs! The only difference between the connector tree and the VTXO virtual tree
 is that all the outputs are fully owned by the operator.
 
+![](/ark/why-connector-tree.png#center)
+
+Each leaf of the connector tree is one connector output, and there is exactly one
+leaf for every forfeit happening in this batch. When a user registers their
+forfeit, the operator hands them their own leaf along with the chain of virtual
+transactions proving that the leaf really does descend from the new batch
+transaction.
+
+![](/ark/connector-fanout.png#center)
+
+So a batch transaction ends up carrying two trees. The batch output pays to the
+VTXT holding everyone's new VTXOs, and the connector output pays to the connector
+tree holding the connectors for everyone's forfeits. Same construction, two very
+different jobs.
+
+![](/ark/batch-anatomy.png#center)
+
+It is worth stressing that the sizes of these two trees have nothing to do with
+each other. The VTXT has one leaf per new VTXO being created in this batch, and
+the connector tree has one leaf per forfeit being processed. Those are different
+users doing different things, so there is no reason at all for the two counts to
+match. A batch might have no forfeits in it (everyone is boarding fresh funds)
+and so no connector tree, or no new VTXOs (everyone is leaving) and so no VTXT.
+And the VTXOs being forfeited will generally be scattered across many different
+older batches: the chances of every VTXO in one tree being refreshed at the same
+time are slim, and nothing about the protocol requires it.
+
+Zooming in on the tree itself: every output in it is a plain dust output paying to
+the operator's connector key, P_oc. That is the whole script. There is no sweep
+path and no timelock, because there is nothing here to protect against. The
+operator owns every output in this tree, from the root all the way down to the
+leaves, so there is nobody to race and nothing to reclaim.
+
+![](/ark/connector-tree.png#center)
+
+Notice too that the connector tree does not have to use the same radix as the
+VTXT. The two trees are built for different reasons and sized by different things,
+so the operator is free to pick whatever shape suits the number of forfeits it is
+processing in this batch.
+
+Unrolling a connector works just like unrolling a VTXO. If the operator ever needs
+a particular connector on-chain, it broadcasts the chain of transactions running
+from the commitment transaction down to the leaf it wants: ctx, then con1, then
+con5.
+
+![](/ark/connector-unrolled.png#center)
+
+Which brings us back to the forfeit transaction, and now we can look at it
+properly. It has two inputs: vtx_a:0, the VTXO being given up, spent via its
+collaborative path, and con1:0, the connector leaf. Its single output pays the
+value of the old VTXO across to the operator.
+
+![](/ark/forfeit-tx-structure.png#center)
+
 
 [litepaper]: https://docs.arklabs.xyz/ark.pdf
 [arkade]: https://github.com/lightninglabs/ark
