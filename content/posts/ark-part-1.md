@@ -5,6 +5,9 @@ date: 2026-08-18
 ShowToc: true
 aliases:
   - /ark-part-1
+
+cover:
+    image: "/ark/cover.png"
 ---
 
 <!--
@@ -162,12 +165,21 @@ older batches: the chances of every VTXO in one tree being refreshed at the same
 time are slim, and nothing about the protocol requires it.
 
 Zooming in on the tree itself: every output in it is a plain dust output paying to
-the operator's connector key, P_oc. That is the whole script. There is no sweep
+the operator's key, <code>P<sub>o</sub></code>. That is the whole script. There is no sweep
 path and no timelock, because there is nothing here to protect against. The
 operator owns every output in this tree, from the root all the way down to the
 leaves, so there is nobody to race and nothing to reclaim.
 
 ![](/ark/connector-tree.png#center)
+
+The amounts are worth a word too. A connector carries no real value. Its only job
+is to be the second input of a forfeit transaction so that the forfeit is
+worthless until the batch transaction is on-chain. So each leaf is a dust output,
+the smallest amount the network will relay. Every node above the leaves then has
+to carry enough to fund all the connectors underneath it, which is why the parent
+of four connectors holds four times dust. The operator funds all of this out of
+the batch transaction, so a connector tree costs it a small, fixed amount per
+forfeit.
 
 Notice too that the connector tree does not have to use the same radix as the
 VTXT. The two trees are built for different reasons and sized by different things,
@@ -176,14 +188,14 @@ processing in this batch.
 
 Unrolling a connector works just like unrolling a VTXO. If the operator ever needs
 a particular connector on-chain, it broadcasts the chain of transactions running
-from the commitment transaction down to the leaf it wants: ctx, then con1, then
-con5.
+from the commitment transaction down to the leaf it wants: `ctx`, then `con1`,
+then `con5`.
 
 ![](/ark/connector-unrolled.png#center)
 
 Which brings us back to the forfeit transaction, and now we can look at it
-properly. It has two inputs: vtx_a:0, the VTXO being given up, spent via its
-collaborative path, and con1:0, the connector leaf. Its single output pays the
+properly. It has two inputs: `vtx_a:0`, the VTXO being given up, spent via its
+collaborative path, and `con1:0`, the connector leaf. Its single output pays the
 value of the old VTXO across to the operator.
 
 ![](/ark/forfeit-tx-structure.png#center)
@@ -191,3 +203,19 @@ value of the old VTXO across to the operator.
 
 [litepaper]: https://docs.arklabs.xyz/ark.pdf
 [arkade]: https://github.com/lightninglabs/ark
+
+## Leave Requests
+
+Everything above used a batch swap as the example, but a leave request works in
+exactly the same way. The only thing that changes is what the operator puts in the
+new batch transaction for you.
+
+In a batch swap you are given a fresh VTXO as a leaf of the new VTXT. In a leave
+request you are given a plain output on the batch transaction itself, paying you
+on-chain, and there is no restriction on the script you ask it to pay to.
+
+Everything else is untouched. You still forfeit your old VTXO, the forfeit
+transaction still spends that VTXO together with a connector leaf from the new
+batch transaction, and the same atomicity holds: if the batch transaction
+confirms then your coins are on-chain and the operator can claim the old VTXO,
+and if it never confirms then your old VTXO is still yours.
