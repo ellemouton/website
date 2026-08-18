@@ -1,6 +1,6 @@
 ---
-title: "The Ark Protocol: Part 1"
-summary: "Virtual Transaction Trees, Batch Transactions, Forfeits and Connectors"
+title: "The Ark Protocol: Forfeit Transactions and Connector Trees"
+summary: "How leaving and refreshing a VTXO are made atomic and trustless"
 date: 2026-08-18
 ShowToc: true
 aliases:
