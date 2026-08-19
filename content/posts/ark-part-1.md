@@ -162,6 +162,12 @@ timelock, because there is nothing here to protect against. The operator owns
 every output in this tree, from the root all the way down to the leaves, so there
 is nobody to race and nothing to reclaim.
 
+Just as with the VTXT, these diagrams leave one thing out. Every virtual
+transaction in the connector tree also carries a zero-value ephemeral anchor
+output. These transactions are all built with zero fees, so that anchor is how
+the operator attaches a fee via CPFP if it ever does need to get them confirmed
+on-chain.
+
 The amounts are worth a word too. A connector carries no real value. Its only job
 is to be the second input of a forfeit transaction, so that the forfeit is
 worthless until the batch transaction is on-chain. So each leaf is a dust output,
