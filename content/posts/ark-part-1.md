@@ -176,6 +176,11 @@ transaction has to hold enough to fund all of the leaves below it: four forfeits
 four times dust. A connector tree therefore costs the operator a small, fixed
 amount per forfeit.
 
+That money is not gone, though. The connector output pays straight to the
+operator's own key, so it can sweep the whole thing back whenever it likes, and
+it will do exactly that once the amount sitting there has grown enough to be
+worth the transaction fee to collect.
+
 Notice too that the connector tree does not have to use the same radix as the
 VTXT. The two trees are built for different reasons and sized by different things,
 so the operator is free to pick whatever shape suits the number of forfeits it is
