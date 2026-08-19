@@ -60,10 +60,12 @@ the operator are required in order to produce a valid Ark transaction.
 
 ![](/ark/oor-tx-details.png#center)
 
-Ok cool, now that we've seen some of the scenarios we'd like to support, let's take
-a second to answer a few important questions like:
+## A few important questions
 
-## What data do I as a receiver of an OOR derived VTXO need to have so that I can still unroll if needed?
+Ok cool, now that we've seen some of the scenarios we'd like to support, let's take
+a second to answer a few important questions.
+
+### What data do I need to keep?
 
 If you own a round-born VTXO (ie, a leaf of a VTXT), you must have all the
 transactions in the tree path that lead from the batch transaction to your VTXO.
@@ -78,7 +80,7 @@ those confirmations which can get expensive quite quickly.
 
 <!-- DIAGRAM 1 (Elle TODO): long chain that needs to be confirmed, maybe with multiple parent batches -->
 
-## What on-chain outputs should I keep an eye on?
+### What should I watch on-chain?
 
 If you own a round-born VTXO, you are in the safest position as long as you
 remember to refresh your VTXO before the batch expires. Even if someone else
@@ -96,7 +98,7 @@ not be timelocked since Ark transactions spend along the collaborative path.
 
 <!-- DIAGRAM 2 (Elle TODO): how a previous owner can try to exit -->
 
-## What protects against double spends?
+### What protects against double spends?
 
 This is the one place where trust really comes into play. OOR transactions spend
 via a VTXO's collaborative path with the operator and so no Ark transaction can be
@@ -112,7 +114,7 @@ that the operator is not trustworthy and would destroy its reputation.
 
 <!-- DIAGRAM 3 (Elle TODO): the double spend -->
 
-## So what is the best practice for you as a receiver?
+### What is the best practice for a receiver?
 
 Due to all the reasons mentioned above, if you receive an OOR derived
 (pre-confirmed) VTXO then unless you are planning on immediately spending it via
@@ -280,6 +282,12 @@ to get back ownership of the funds:
 
 Once again the operator can just broadcast the very next checkpoint. This process
 repeats all the way to the end of the chain where the forfeit is finally broadcast.
+
+It is worth putting the two versions of the attack side by side, because one label
+changes and it is the whole point. In the first version, confirming that chain was
+the operator's responsibility and Alice paid nothing to make it happen. With
+checkpoints, ratcheting the chain forward is the client's responsibility, and Alice
+pays for every step of it.
 
 So with checkpoint transactions, the client is incentivised not to try this attack
 since they are no longer easily able to grief the operator and they would need to
