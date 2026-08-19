@@ -151,45 +151,44 @@ And the VTXOs being forfeited will generally be scattered across many different
 older batches: the chances of every VTXO in one tree being refreshed at the same
 time are slim, and nothing about the protocol requires it.
 
-Now let's climb down into the connector tree itself. When a user registers their
-forfeit, the operator hands them one leaf of this tree along with the chain of
-virtual transactions proving that the leaf really does descend from the new batch
-transaction.
+Let's make that concrete. Say four users have each requested a forfeit in this
+batch. The operator builds them a connector tree with one leaf apiece:
 
-![](/ark/connector-fanout.png#center)
+![](/ark/connector-tree.png#center)
 
-Every output in the tree is a plain dust output paying to the operator's key,
+Every output in that tree is a plain dust output paying to the operator's key,
 <code>P<sub>o</sub></code>. That is the whole script. There is no sweep path and no
 timelock, because there is nothing here to protect against. The operator owns
 every output in this tree, from the root all the way down to the leaves, so there
 is nobody to race and nothing to reclaim.
 
-![](/ark/connector-tree.png#center)
-
 The amounts are worth a word too. A connector carries no real value. Its only job
-is to be the second input of a forfeit transaction so that the forfeit is
+is to be the second input of a forfeit transaction, so that the forfeit is
 worthless until the batch transaction is on-chain. So each leaf is a dust output,
-the smallest amount the network will relay. Every node above the leaves then has
-to carry enough to fund all the connectors underneath it, which is why the parent
-of four connectors holds four times dust. The operator funds all of this out of
-the batch transaction, so a connector tree costs it a small, fixed amount per
-forfeit.
+the smallest amount the network will relay, and the connector output on the batch
+transaction has to hold enough to fund all of the leaves below it: four forfeits,
+four times dust. A connector tree therefore costs the operator a small, fixed
+amount per forfeit.
 
 Notice too that the connector tree does not have to use the same radix as the
 VTXT. The two trees are built for different reasons and sized by different things,
 so the operator is free to pick whatever shape suits the number of forfeits it is
 processing in this batch.
 
-Unrolling a connector works just like unrolling a VTXO. If the operator ever needs
-a particular connector on-chain, it broadcasts the chain of transactions running
-from the batch transaction down to the leaf it wants: `ctx`, then `con1`, then
-`con5`.
+Now, each of those four users only needs one leaf. So the operator hands each of
+them the chain of virtual transactions running from the batch transaction down to
+their own connector, and nothing more. For the first of them that is `ctx`, then
+`con5`, then `con1`:
 
 ![](/ark/connector-unrolled.png#center)
 
-Which brings us back to the forfeit transaction, and now we can look at it
-properly. It has two inputs: `vtx_a:0`, the VTXO being given up, spent via its
-collaborative path, and `con1:0`, the connector leaf. Its single output pays the
+That chain is what proves to the user that their connector really does descend
+from this batch transaction. It is also exactly what gets broadcast if the
+connector ever does need to go on-chain.
+
+And now that user can build their forfeit transaction. It takes two inputs:
+`vtx_a:0`, the VTXO they are giving up, spent via its collaborative path, and
+`con1:0`, the connector leaf they were just handed. Its single output pays the
 value of the old VTXO across to the operator.
 
 ![](/ark/forfeit-tx-structure.png#center)
