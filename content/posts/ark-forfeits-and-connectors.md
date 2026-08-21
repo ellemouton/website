@@ -18,6 +18,14 @@ cover:
 </ol>
 </div>
 
+In the previous article we built up the Virtual Transaction Tree: how a VTXO sits
+as a leaf of that tree, how the whole tree hangs off a single Batch transaction,
+and how the batch output carries an expiry after which the operator can sweep the
+funds.
+
+That expiry is really what makes this article necessary. You cannot simply sit on a
+VTXO forever and hope for the best.
+
 There are a few actions a VTXO owner might want to take that also involve
 participating in a round.
 
@@ -156,6 +164,12 @@ and so no connector tree, or no new VTXOs (everyone is leaving) and so no VTXT.
 And the VTXOs being forfeited will generally be scattered across many different
 older batches: the chances of every VTXO in one tree being refreshed at the same
 time are slim, and nothing about the protocol requires it.
+
+![](/ark/vtxo-set-across-batches.png#center)
+
+There is really just one VTXO set, spread across whichever batches happen to be
+alive at the time. Each batch runs to its own expiry, so `batch_0` here has already
+expired and been swept while `batch_1` and `batch_2` are still going.
 
 Let's make that concrete. Say four users have each requested a forfeit in this
 batch. The operator builds them a connector tree with one leaf apiece:
