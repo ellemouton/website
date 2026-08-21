@@ -10,7 +10,7 @@ cover:
 
 ## Test test, is this thing on?
 
-Howzit y’all! It’s been a while. I’m stepping away from the Bitcoin space for now, and before I go I wanted to write down what I’ve spent the past year or so learning about. So: Ark.
+Howzit y’all! It’s been a while.
 
 You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles:
 
@@ -21,7 +21,9 @@ You have probably heard about the Ark protocol by now but you may have many ques
 <li><a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer"><strong>Forfeit Transactions and Connector Trees</strong></a><br>How you leave the Ark or keep a VTXO alive.</li>
 <li><a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer"><strong>Out-of-Round Transactions</strong></a><br>Also called OOR transactions or Ark transactions, along with Checkpoint transactions.</li>
 </ol>
-</div> The ideas here are not new but instead glean ideas from the <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">Ark Labs lite paper</a>, which I will refer back to throughout.
+</div>
+
+The ideas here are not new but instead glean ideas from the <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">Ark Labs lite paper</a>, which I will refer back to throughout.
 
 ## The Big Picture
 
