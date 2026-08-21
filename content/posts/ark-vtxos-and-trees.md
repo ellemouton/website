@@ -9,15 +9,9 @@ ShowToc: true
 
 ## Test test, is this thing on?
 
-Howzit y’all! It’s been a while. I’m back at it, but this time with a slightly new topic: Ark. You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles: the first one (this one) will cover the why along with explaining the Virtual Transaction Tree and Batch transaction concepts. The <a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer">next one</a> covers the forfeit flow, which is how you leave the Ark or keep a VTXO alive. The <a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer">one after that</a> then dives deeper into Out-of-Round Transactions (a.k.a Ark Transactions) along with Checkpoint transactions.
+Howzit y’all! It’s been a while. I’m stepping away from the Bitcoin and Lightning space for now, and before I go I wanted to write down what I’ve spent the past year or so learning about. So: Ark.
 
-## Resources
-
-The ideas here are not new but instead glean ideas from two main resources that I
-will refer back to throughout:
-
-1. The arkade implementation: <a href="https://github.com/lightninglabs/ark" target="_blank" rel="noopener noreferrer">github.com/lightninglabs/ark</a>
-2. The Ark Labs lite paper: <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">docs.arklabs.xyz/ark.pdf</a>
+You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles: the first one (this one) will cover the why along with explaining the Virtual Transaction Tree and Batch transaction concepts. The <a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer">next one</a> covers the forfeit flow, which is how you leave the Ark or keep a VTXO alive. The <a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer">one after that</a> then dives deeper into Out-of-Round Transactions (a.k.a Ark Transactions) along with Checkpoint transactions. The ideas here are not new but instead glean ideas from the <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">Ark Labs lite paper</a>, which I will refer back to throughout.
 
 ## The Big Picture
 
@@ -45,7 +39,7 @@ This is a time delayed path that can be spent by the owner of the VTXO after a C
 
 What does this look like under the hood? Well, like all Taproot outputs, the actual output script will just be a normal `OP_1` that pays to a Taproot output key, `Q`. This `Q` is made up of an internal NUMS point key along with the two mentioned scripts committed via a Tap Tweak.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 1</strong><br>the VTXO taproot output under the hood: OP_1 paying to Q, NUMS internal key, two committed scripts</div>
+![](/ark/vtxt-taproot-output.png#center)
 
 From now on, I’ll represent VTXO outputs in the following, more condensed, format:
 
@@ -57,17 +51,17 @@ One quick aside here to note is that we are specifically using MultiSig for the 
 
 Alright, now we know what a single VTXO output looks like. But we know we want to get to a construction where we are “embedding” _multiple_ of these outputs within a single UTXO. So let’s work with an example where we have four VTXOs for four different clients that we want to represent. Here we have four different participants each with a different output value and unique spending script.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 3</strong><br>four VTXOs for four participants, each with its own value and spending script</div>
+![](/ark/vtxt-four-vtxos.png#center)
 
 But these are just output scripts. They need to be included in transactions for them to be meaningful. So let’s put each one in a Virtual Transaction (VTX). These VTXs will eventually be the leaves of our Virtual Transaction Tree (VTXT). Note the labelling of the various transactions: `vtx1`… `vtx4`.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 4</strong><br>each VTXO placed in its own virtual transaction, the VTXT leaves</div>
+![](/ark/vtxt-leaf-txs.png#center)
 
 You might be asking: “Why not have all the outputs in a single transaction?”. The reason is that we want participants to be able to exit the ark unilaterally without requiring the rest of the participants to exit. If a single transaction was used to represent all the VTXOs then if one client decided to take their output on-chain, they would start the CSV timeout for all participants who share the transaction and thereby force them to exit the Ark. Therefore, each VTXO gets its own transaction. One detail to note that I’m leaving out of the diagrams is that all these transactions make use of <a href="https://bitcoinops.org/en/topics/ephemeral-anchors/" target="_blank" rel="noopener noreferrer">Ephemeral Anchors</a>. This allows the picking of transaction fees to happen at the time of on-chain broadcast via <a href="https://bitcoinops.org/en/topics/cpfp/" target="_blank" rel="noopener noreferrer">CPFP</a>.
 
 Ok great, we have our first set of VTXT leaf transactions representing our four VTXOs. Now we need to work backwards to see how we can use a single on-chain UTXO to represent these. What we do next is to create a layer of virtual branch transactions that will produce the outputs that will be used as inputs for the layer of leaf transactions we have.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 5</strong><br>the first layer of branch transactions feeding the leaves</div>
+![](/ark/vtxt-branch-layer.png#center)
 
 A few things to note about the diagram above:
 - I’ve chosen a radix of 2 here meaning that each branch tx branches out to two new outputs. But we could have chosen a radix of four too. There are tradeoffs which we can get into later on. For the purpose of this example, we will stick with two.
@@ -80,7 +74,7 @@ So now we have these two branch transactions that are basically “embedded” i
 
 We then repeat this embedding process with another layer which for this example happens to be the root transaction:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 6</strong><br>the root transaction combining the branch outputs</div>
+![](/ark/vtxt-root-tx.png#center)
 
 The important thing to notice this time is that the outputs now are the combination of the value amounts required for the two branch transactions. So the 0 index output of `vtx7` pays a total of <code>v<sub>1</sub></code>+<code>v<sub>2</sub></code> and the collaborative path must include MuSig2 signatures for both participants <code>P<sub>0</sub></code>, <code>P<sub>1</sub></code> and the operator, <code>P<sub>o</sub></code>. The timeout path remains owned by the Operator.
 
@@ -92,7 +86,7 @@ Note once again what this output includes: the value paid to it is the combinati
 
 Right, so what ends up onchain is a Batch Transaction with a Batch Output like the following:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 8</strong><br>the Batch Transaction with its Batch Output</div>
+![](/ark/vtxt-batch-tx.png#center)
 
 ## Unilateral Exit / Unrolling
 
@@ -118,13 +112,13 @@ Let’s walk through the scenario of the batch expiry being reached for both the
 
 In the happy case, only the main batch transaction with the batch output makes it on-chain. Once the output expires, the operator can sweep the funds to itself via a single sweep transaction and without the cooperation of any of the other participants.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 11</strong><br>the happy path sweep: one sweep transaction after expiry</div>
+![](/ark/vtxt-happy-sweep.png#center)
 
 ### Sweeping after unilateral or partial exit
 
 In the case where some of the transactions from the VTXT make it on chain due to one or more of the parties attempting to unilaterally exit, the operator can sweep any of the unspent outputs owned by it as follows:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 12</strong><br>sweeping around branches that made it on-chain after a partial exit</div>
+![](/ark/vtxt-sweep-after-exit.png#center)
 
 At this point you may still have many questions like:
 - What happens with my VTXO at expiry time? Does the Operator just get all my funds at this point?
@@ -156,7 +150,6 @@ There are multiple actions a client can take in a batch transaction but for now 
 
 ## Elle's TODOs carried over from the draft
 
-- Explainer Strategy section was never written; the empty heading has been dropped
 - Step by step tree building, still to write: "Start at root with 5 pub keys + 5
   values and paying to the outputs. At this point that txid is known and so the next
   txs can be formed, and so on." This is the gap in "Building the Batch Transaction",
