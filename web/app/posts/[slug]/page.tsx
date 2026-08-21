@@ -6,6 +6,7 @@ import { Utterances } from "@/components/Utterances";
 import { PostToc } from "@/components/PostToc";
 import { PostTocSidebar } from "@/components/PostTocSidebar";
 import { extractHeadings, nest } from "@/lib/toc";
+import { ImageZoom } from "@/components/ImageZoom";
 
 export async function generateStaticParams() {
   const slugs = await listPostSlugs();
@@ -117,6 +118,8 @@ export default async function PostPage({
         className="post-content"
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
+
+      <ImageZoom />
 
       <Utterances />
     </article>
