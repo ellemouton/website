@@ -9,6 +9,15 @@ cover:
 
 # Forfeit Transactions and Connector Trees
 
+<div style="border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;background:var(--entry);">
+<strong>The Ark series</strong>
+<ol style="margin:0.6rem 0 0;padding-left:1.3rem;line-height:1.6;">
+<li><a href="../../posts/ark-vtxos-and-trees" target="_blank" rel="noopener noreferrer"><strong>VTXOs and the Virtual Transaction Tree</strong></a><br>The why, plus the Virtual Transaction Tree and Batch transaction concepts.</li>
+<li><strong>Forfeit Transactions and Connector Trees</strong> &nbsp;<em>(you are here)</em><br>How you leave the Ark or keep a VTXO alive.</li>
+<li><a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer"><strong>Out-of-Round Transactions</strong></a><br>Also called OOR transactions or Ark transactions, along with Checkpoint transactions.</li>
+</ol>
+</div>
+
 There are a few actions a VTXO owner might want to take that also involve
 participating in a round.
 

@@ -7,6 +7,15 @@ ShowToc: true
 
 # OOR Transactions
 
+<div style="border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;background:var(--entry);">
+<strong>The Ark series</strong>
+<ol style="margin:0.6rem 0 0;padding-left:1.3rem;line-height:1.6;">
+<li><a href="../../posts/ark-vtxos-and-trees" target="_blank" rel="noopener noreferrer"><strong>VTXOs and the Virtual Transaction Tree</strong></a><br>The why, plus the Virtual Transaction Tree and Batch transaction concepts.</li>
+<li><a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer"><strong>Forfeit Transactions and Connector Trees</strong></a><br>How you leave the Ark or keep a VTXO alive.</li>
+<li><strong>Out-of-Round Transactions</strong> &nbsp;<em>(you are here)</em><br>Also called OOR transactions or Ark transactions, along with Checkpoint transactions.</li>
+</ol>
+</div>
+
 We've covered how to establish a VTXO in an Ark, how to leave the Ark and how to
 keep the VTXO alive by performing a Batch Swap. All of these require a round
 interaction meaning that the user has to join a round and wait for the resulting
