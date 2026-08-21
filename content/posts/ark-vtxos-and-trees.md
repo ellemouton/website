@@ -155,15 +155,47 @@ The process of forming the batch transaction which will describe the VTXT is cal
 
 The server at this point knows the batch output and so can build the rest of the batch transaction. It will use boarding transactions from the users as inputs. It may also add inputs of its own to further fund the transaction along with change outputs. We will later get to the other parts of this transaction.
 
+Here is the full template, with room for everything a batch transaction might
+carry:
+
+![](/ark/vtxt-batch-tx-template.png#center)
+
+We have only used a few of those boxes so far. The leave outputs and connector
+outputs are what get used when people start leaving the Ark or refreshing their
+VTXOs, which is the subject of the next article.
+
 Note that at this point in time, the full structure of the batch transaction and the VTXT is known but nothing has been signed yet. The users will not be willing to sign the collaborative path of their boarding UTXOs until they are sure that they will get the requested VTXOs in return. So at this point in time, the operator sends each user the unsigned transactions relevant to them. If we focus on Alice, Alice will be sent: the unsigned Batch transaction (which will include Alice’s boarding UTXO as one of the inputs) along with all the transactions in the VTXT that lead from the root output of the tree to Alice’s VTXO. Alice will verify the path to her VTXO before continuing.
+
+### The signing order
+
+What happens next follows a pattern that shows up in almost every interaction
+between a user and the operator, so it is worth pulling out explicitly.
+
+1. The user prepares their input and leaves it **unsigned**.
+2. They hand it over. The operator builds the final form of whatever is being made,
+   still unsigned, wiring the user's input in as an input or a dependency.
+3. The user checks the result. If they are happy with it, they sign, and only for
+   their own input.
+4. The operator adds its own signatures and broadcasts.
+
+![](/ark/signing-flow.png#center)
+
+Two things fall out of that ordering, and between them they are what make these
+flows trustless.
+
+The first is that the user never gives anything up before they can see exactly what
+they get back. By the time they are asked to sign in step 3, the finished thing is
+sitting in front of them.
+
+The second is that the signature they hand over is bound to that one transaction.
+If the operator never broadcasts it, or goes off and builds something different,
+the signature is worth nothing to anybody, and the user still holds whatever they
+started with.
+
+So neither side has to trust the other. The user cannot be made to pay for
+something they have not seen, and the operator cannot be left holding a promise it
+has no way to enforce.
 
 operator starts a registration phase. Its public key, <code>P<sub>o</sub></code>, is advertised up front and all wanna-be participants know it along with other operator terms like the batch expiry that it will use and any min/max VTXO amounts that it allows, as well as the radix that it will use for its VTXT construction.
 
 There are multiple actions a client can take in a batch transaction but for now we will focus just on the boarding of the ark: clients all have onchain UTXOs that they would like to exchange for in-Ark VTXOs.
-
-## Elle's TODOs carried over from the draft
-
-- Step by step tree building, still to write: "Start at root with 5 pub keys + 5
-  values and paying to the outputs. At this point that txid is known and so the next
-  txs can be formed, and so on." This is the gap in "Building the Batch Transaction",
-  which currently stops after Step 2 with nothing signed yet.
