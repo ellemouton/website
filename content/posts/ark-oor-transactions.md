@@ -78,7 +78,7 @@ deeper the OOR lineage chain is, the more transactions you will need to get
 confirmed on-chain in order to unroll and you would need to cover the fees for
 those confirmations which can get expensive quite quickly.
 
-<!-- DIAGRAM 1 (Elle TODO): long chain that needs to be confirmed, maybe with multiple parent batches -->
+<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 1 (Elle TODO)</strong><br>long chain that needs to be confirmed, maybe with multiple parent batches</div>
 
 ### What should I watch on-chain?
 
@@ -96,7 +96,7 @@ path. But if you do notice they go on-chain, all you need to do is to "correct" 
 state by broadcasting the Ark transaction that spends from their VTXO which will
 not be timelocked since Ark transactions spend along the collaborative path.
 
-<!-- DIAGRAM 2 (Elle TODO): how a previous owner can try to exit -->
+<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 2 (Elle TODO)</strong><br>how a previous owner can try to exit</div>
 
 ### What protects against double spends?
 
@@ -112,7 +112,7 @@ operator has misbehaved in this way as you'd be able to show the public two full
 signed transactions that double spend the same VTXO. This would prove to the public
 that the operator is not trustworthy and would destroy its reputation.
 
-<!-- DIAGRAM 3 (Elle TODO): the double spend -->
+<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 3 (Elle TODO)</strong><br>the double spend</div>
 
 ### What is the best practice for a receiver?
 
@@ -124,7 +124,7 @@ double spending your VTXO input and you have the minimal number of transactions 
 unroll. You also then avoid the risk of a spent VTXO owner in your VTXO's lineage
 attempting to unilaterally exit.
 
-<!-- DIAGRAM 4 (Elle TODO): batch swap of a deep OOR VTXO -->
+<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 4 (Elle TODO)</strong><br>batch swap of a deep OOR VTXO</div>
 
 ## Griefing Attack
 
