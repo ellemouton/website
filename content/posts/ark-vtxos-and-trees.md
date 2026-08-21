@@ -3,21 +3,31 @@ title: "The Ark Protocol: VTXOs and the Virtual Transaction Tree"
 summary: "How many users share one on-chain UTXO while keeping custody of their funds"
 date: 2026-08-19
 ShowToc: true
----
 
-# VTXOs and the Virtual Transaction Tree
+cover:
+    image: "/ark/cover-vtxos.png"
+---
 
 ## Test test, is this thing on?
 
-Howzit y’all! It’s been a while. I’m stepping away from the Bitcoin and Lightning space for now, and before I go I wanted to write down what I’ve spent the past year or so learning about. So: Ark.
+Howzit y’all! It’s been a while. I’m stepping away from the Bitcoin space for now, and before I go I wanted to write down what I’ve spent the past year or so learning about. So: Ark.
 
-You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles: the first one (this one) will cover the why along with explaining the Virtual Transaction Tree and Batch transaction concepts. The <a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer">next one</a> covers the forfeit flow, which is how you leave the Ark or keep a VTXO alive. The <a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer">one after that</a> then dives deeper into Out-of-Round Transactions (a.k.a Ark Transactions) along with Checkpoint transactions. The ideas here are not new but instead glean ideas from the <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">Ark Labs lite paper</a>, which I will refer back to throughout.
+You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles:
+
+<div style="border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;background:var(--entry);">
+<strong>The Ark series</strong>
+<ol style="margin:0.6rem 0 0;padding-left:1.3rem;line-height:1.6;">
+<li><strong>VTXOs and the Virtual Transaction Tree</strong> &nbsp;<em>(you are here)</em><br>The why, plus the Virtual Transaction Tree and Batch transaction concepts.</li>
+<li><a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer"><strong>Forfeit Transactions and Connector Trees</strong></a><br>How you leave the Ark or keep a VTXO alive.</li>
+<li><a href="../../posts/ark-oor-transactions" target="_blank" rel="noopener noreferrer"><strong>Out-of-Round Transactions</strong></a><br>Also called OOR transactions or Ark transactions, along with Checkpoint transactions.</li>
+</ol>
+</div> The ideas here are not new but instead glean ideas from the <a href="https://docs.arklabs.xyz/ark.pdf" target="_blank" rel="noopener noreferrer">Ark Labs lite paper</a>, which I will refer back to throughout.
 
 ## The Big Picture
 
-The brief description of Ark is that it allows users of Bitcoin to essentially _share_ a UTXO. Each user participating in the Ark has one or more VTXOs (Virtual UTXOs) which they can spend as new transaction inputs to create new VTXO outputs - just like the UTXOs we all know and love except that for in the happy case, these off-chain VTXOs and virtual transactions (VTXs) never need to make it on-chain. So an Ark is a virtual world that is backed by a number of real, confirmed UTXOs where users can use their bitcoin as per usual without each Tx needing to be confirmed on-chain. This means transacting can happen much faster and much cheaper than in the normal UTXO case. When a user of the Ark does want to exit the Ark to produce a normal UTXO, they still will pay a much lower fee due to the fact that the batch transaction producing the UTXO is shared by many users and the Ark operator and so even that fee will be substantially less than normal UTXO fees.
+The brief description of Ark is that it allows users of Bitcoin to essentially _share_ a UTXO. Each user participating in the Ark has one or more VTXOs (Virtual UTXOs) which they can spend as new transaction inputs to create new VTXO outputs - just like the UTXOs we all know and love except that for in the happy case, these off-chain VTXOs and virtual transactions (VTXs) never need to make it on-chain. So an Ark is a virtual world that is backed by a number of real, confirmed UTXOs where users can use their bitcoin as per usual without each transaction needing to be confirmed on-chain. This means transacting can happen much faster and much cheaper than in the normal UTXO case. When a user of the Ark does want to exit the Ark to produce a normal UTXO, they still will pay a much lower fee due to the fact that the batch transaction producing the UTXO is shared by many users and the Ark operator and so even that fee will be substantially less than normal UTXO fees.
 
-Ok ok so there are many questions that may be arising for you at this point: what exactly is the trust model here? What are the tradeoffs? Does this replace Lightning? We will get to all of these in the journey that follows. For now, a good place to start is the Virtual UTXO. What does it look like and how does the concept allow multiple users to “share” a UTXO? Let’s dive in.
+Ok ok so there are many questions that may be arising for you at this point: what exactly is the trust model here? What are the tradeoffs? We will get to all of these in the journey that follows. For now, a good place to start is the Virtual UTXO. What does it look like and how does the concept allow multiple users to “share” a UTXO? Let’s dive in.
 
 ## VTXOs and the Virtual Transaction Tree (VTXT)
 
@@ -27,7 +37,11 @@ This is done by using a set of pre-signed transactions that take the form of a t
 
 ### The VTXO
 
-Let’s start off by looking at a single VTXO within the tree. If you are a participant in the tree, this will be an output that you control. The output is a Taproot output and has two spend paths (if you need to brush up on Taproot scripts, see my <a href="../../posts/taproot-prelims" target="_blank" rel="noopener noreferrer">previous article</a> on the topic). The two spend paths are:
+Let’s start off by looking at a single VTXO within the tree. If you are a participant in the tree, this will be an output that you control. The output is a Taproot output and has two spend paths (if you need to brush up on Taproot scripts, see my <a href="../../posts/taproot-prelims" target="_blank" rel="noopener noreferrer">previous article</a> on the topic).
+
+![](/ark/vtxt-taproot-output.png#center)
+
+The two spend paths are:
 
 **Collaborative Spend Path**
 
@@ -39,11 +53,9 @@ This is a time delayed path that can be spent by the owner of the VTXO after a C
 
 What does this look like under the hood? Well, like all Taproot outputs, the actual output script will just be a normal `OP_1` that pays to a Taproot output key, `Q`. This `Q` is made up of an internal NUMS point key along with the two mentioned scripts committed via a Tap Tweak.
 
-![](/ark/vtxt-taproot-output.png#center)
-
 From now on, I’ll represent VTXO outputs in the following, more condensed, format:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 2</strong><br>the condensed VTXO notation: value v, MultiSig(P_o, P_c) and t_e(P_c)</div>
+![](/ark/vtxt-condensed-vtxo.png#center)
 
 The `v` here being the value in bitcoin being committed to the output. The <code>MultiSig(P<sub>o</sub>, P<sub>c</sub>)</code> represents the collaborative path and the <code>t<sub>e</sub>(P<sub>c</sub>)</code> represents the relative time path.
 
@@ -64,13 +76,12 @@ Ok great, we have our first set of VTXT leaf transactions representing our four 
 ![](/ark/vtxt-branch-layer.png#center)
 
 A few things to note about the diagram above:
-- I’ve chosen a radix of 2 here meaning that each branch tx branches out to two new outputs. But we could have chosen a radix of four too. There are tradeoffs which we can get into later on. For the purpose of this example, we will stick with two.
+- I’ve chosen a radix of 2 here meaning that each branch transaction branches out to two new outputs. But we could have chosen a radix of four too. There are tradeoffs which we can get into later on. For the purpose of this example, we will stick with two.
+- If you look closely at the scripts of the branch transaction outputs, they differ to the VTXO outputs in two ways:
+    - Here we have switched to MuSig2 for the collaborative path.
+    - The timeout path here is spendable by the _Operator_ and so these outputs are “owned” by the Operator. This is an important difference. If one of these transactions ends up on-chain but the leaves spending them do not, then it does not mean anything for the Ark participants and their VTXO balances within the Ark. It just means that after the given timeout, the Operator will be able to sweep the funds. Note: participants in this tree would _refresh_ their VTXOs before the operator sweeps the funds - but we will get to that later on.
 
-If you look closely at the scripts of the branch tx outputs, they differ to the VTXO outputs in two ways:
-- Here we have switched to MuSig2 for the collaborative path.
-- The timeout path here is spendable by the _Operator_ and so these outputs are “owned” by the Operator. This is an important difference. If one of these transactions ends up on-chain but the leaves spending them do not, then it does not mean anything for the Ark participants and their VTXO balances within the Ark. It just means that after the given timeout, the Operator will be able to sweep the funds. Note: participants in this tree would _refresh_ their VTXOs before the operator sweeps the funds - but we will get to that later on.
-
-So now we have these two branch transactions that are basically “embedded” in the leaf transactions. The leaf transactions will have inputs that point specially to these branch transactions & so the leaf transactions only become meaningful if the branch transaction creating the input it requires ever makes it on-chain. And how do participants know that the branch tx outputs won’t just be spent in some other way other than via the leaf transactions that pay to their VTXOs? Because as we will see during the setup flow of the tree, all these tree transactions will be pre-signed by all participants and the Operator and the participants would only ever be incentivised to sign the valid leaf transactions that spend the branch tx outputs. This is the only time they would happily sign for the collaborative path. And because of the TapTree being used in the branch transactions, the only other way for those outputs to be spent would be for the operator to broadcast them and then wait for the timeout branch to become active.
+So now we have these two branch transactions that are basically “embedded” in the leaf transactions. The leaf transactions will have inputs that point specially to these branch transactions & so the leaf transactions only become meaningful if the branch transaction creating the input it requires ever makes it on-chain. And how do participants know that the branch transaction outputs won’t just be spent in some other way other than via the leaf transactions that pay to their VTXOs? Because as we will see during the setup flow of the tree, all these tree transactions will be pre-signed by all participants and the Operator and the participants would only ever be incentivised to sign the valid leaf transactions that spend the branch transaction outputs. This is the only time they would happily sign for the collaborative path. And because of the TapTree being used in the branch transactions, the only other way for those outputs to be spent would be for the operator to broadcast them and then wait for the timeout branch to become active.
 
 We then repeat this embedding process with another layer which for this example happens to be the root transaction:
 
@@ -80,7 +91,7 @@ The important thing to notice this time is that the outputs now are the combinat
 
 The final step is to construct the script of the UTXO that will actually appear on-chain that will represent the above tree:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 7</strong><br>the on-chain UTXO script representing the whole tree</div>
+![](/ark/vtxt-final-tree.png#center)
 
 Note once again what this output includes: the value paid to it is the combination of all the individual VTXOs in the tree and the MuSig2 keypath includes each participants public key along with the operator’s key. And once again, the timeout path is owned by the operator. This timeout path owned by the operator (along with the other operator owned timeout paths in the tree) actually has a special name: the Sweep Path. This final output is called a “Batch Output” and after the <code>T<sub>e</sub></code> expiry, it expires and the operator will sweep the funds from the batch output.
 
@@ -92,15 +103,15 @@ Right, so what ends up onchain is a Batch Transaction with a Batch Output like t
 
 The important thing to grasp here is that the full tree can go on-chain if needed. During the setup of the tree (which we can cover later), participants and the operator provide all the signatures required such that any participant ends up with the full chain of fully signed transactions from the batch transaction all the way down to the transaction with their VTXO. This means that at any time, if the user wanted to, they can exit the Ark by broadcasting this chain of transactions. They would just need to take responsibility for paying the fees to get the transactions confirmed. Let’s walk through an example to see how a participant would go about doing this and how it would affect the rest of the participants along with the operator.
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 9</strong><br>the full tree, recap</div>
-
 Let’s walk through this. Here is a recap of what the full tree looks like:
+
+![](/ark/vtxt-tree-recap.png#center)
 
 I’ve highlighted in yellow the transactions that participant 1 would care about & would need to keep at hand:
 
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 10</strong><br>participant 1's path highlighted, the transactions they must keep</div>
+![](/ark/vtxt-p1-path.png#center)
 
-So to exit, participant one would just need to broadcast the above chain one by one. They can do this immediately since all the transactions spend the collaborative paths of the previous outputs. When the final leaf transaction makes it on-chain, the participant would just need to wait for the relative time delay to pass and then they can sweep the output. There is no risk of the operator sweeping that output at any time since the participant has not signed for a transaction that spends that output via the collaborative path. The only thing that the participant must keep in mind is that the confirmation of the batch tx and all the virtual tree transactions that have an operator owned sweep path must be spent via the collaborative path before the timeout that would allow the operator to sweep the funds via the sweep path.
+So to exit, participant one would just need to broadcast the above chain one by one. They can do this immediately since all the transactions spend the collaborative paths of the previous outputs. When the final leaf transaction makes it on-chain, the participant would just need to wait for the relative time delay to pass and then they can sweep the output. There is no risk of the operator sweeping that output at any time since the participant has not signed for a transaction that spends that output via the collaborative path. The only thing that the participant must keep in mind is that the confirmation of the batch transaction and all the virtual tree transactions that have an operator owned sweep path must be spent via the collaborative path before the timeout that would allow the operator to sweep the funds via the sweep path.
 
 Notice how this unilateral exit by one participant does not require the final leaf transactions of any of the other participants to go on-chain! So all other participants remain active in the Ark. The Ark floats on!
 
@@ -140,7 +151,7 @@ Each participant will first create an on-chain boarding output. This output look
 
 The process of forming the batch transaction which will describe the VTXT is called a “round”. During the registration phase above, the round is still being formed but at some point, the operator will decide to “seal” the round which means to cut off any new participants from entering the given round. At this point, the operator can build the entire batch transaction structure. The first thing it will do is to build the VTXT template. It does so by taking all the VTXO requests it collected from the participants and using those to build the tree (ie, compute all the virtual transactions within the tree).
 
-The server at this point knows the batch output and so can build the rest of the batch tx. It will use boarding txs from the users as inputs. It may also add inputs of its own to further fund the tx along with change outputs. We will later get to the other parts of this tx.
+The server at this point knows the batch output and so can build the rest of the batch transaction. It will use boarding transactions from the users as inputs. It may also add inputs of its own to further fund the transaction along with change outputs. We will later get to the other parts of this transaction.
 
 Note that at this point in time, the full structure of the batch transaction and the VTXT is known but nothing has been signed yet. The users will not be willing to sign the collaborative path of their boarding UTXOs until they are sure that they will get the requested VTXOs in return. So at this point in time, the operator sends each user the unsigned transactions relevant to them. If we focus on Alice, Alice will be sent: the unsigned Batch transaction (which will include Alice’s boarding UTXO as one of the inputs) along with all the transactions in the VTXT that lead from the root output of the tree to Alice’s VTXO. Alice will verify the path to her VTXO before continuing.
 
