@@ -203,7 +203,7 @@ export function AboutContent() {
           />
           Lightning Infrastructure Engineer | Lightning Labs
         </h3>
-        <DateRange>2021 to Present</DateRange>
+        <DateRange>2021 to 2026</DateRange>
         <p>
           Top contributor to{" "}
           <a
@@ -214,9 +214,9 @@ export function AboutContent() {
             LND
           </a>
           , the most widely-deployed Lightning Network implementation. My
-          work centres on shipping protocol upgrades and large database
+          work centred on shipping protocol upgrades and large database
           migrations safely across a live peer-to-peer network of thousands
-          of nodes. I also lead major features in the{" "}
+          of nodes. I also led major features in the{" "}
           <a
             href="https://github.com/lightninglabs/lightning-terminal/graphs/contributors"
             target="_blank"
@@ -237,7 +237,7 @@ export function AboutContent() {
         <p>Selected highlights:</p>
         <ul>
           <li>
-            <strong>LND graph SQL migration</strong> &mdash; leading the
+            <strong>LND graph SQL migration</strong> &mdash; led the
             multi-PR{" "}
             <a
               href="https://github.com/lightningnetwork/lnd/issues/9795"

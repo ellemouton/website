@@ -276,13 +276,13 @@
       "img/lightning-labs.png",
       [Lightning Infrastructure Engineer],
       [Lightning Labs],
-      [2021 – Present],
+      [2021 – 2026],
     )[
       #bullet[
         Top contributor to
         #link("https://github.com/lightningnetwork/lnd/graphs/contributors?all=1")[#text(fill: accent)[#underline[LND]]],
         the most widely-deployed Bitcoin L2;
-        lead developer-tooling work on
+        led developer-tooling work on
         #link("https://github.com/lightninglabs/lightning-node-connect/graphs/contributors")[#text(fill: accent)[#underline[Lightning Node Connect]]]
         and
         #link("https://github.com/lightninglabs/lightning-terminal")[#text(fill: accent)[#underline[Lightning Terminal]]].
@@ -290,7 +290,7 @@
       #bullet[
         Shipped protocol upgrades and large database migrations safely
         across a live peer-to-peer network of thousands of nodes;
-        leading the multi-PR
+        led the multi-PR
         #link("https://github.com/lightningnetwork/lnd/issues/9795")[#text(fill: accent)[#underline[epic]]]
         moving LND's graph database to SQL.
       ]
