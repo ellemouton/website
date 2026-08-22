@@ -1,7 +1,9 @@
 ---
 title: "The Ark Protocol: OOR Transactions"
-summary: ""
-date: 2026-08-18
+summary: "Paying inside an Ark without waiting for a batch transaction, and what it costs"
+date: 2026-08-22
+cover:
+  image: "/ark/cover-oor.png"
 ShowToc: true
 ---
 
@@ -315,6 +317,25 @@ becomes much more expensive to do. So once again this means that the best practi
 is to perform a batch swap in order to exchange your pre-confirmed VTXO for a
 confirmed one so that you can throw away the long chain of checkpoint and Ark
 transactions.
+
+## Wrapping up
+
+Ark transactions are what make an Ark usable day to day. You can pay someone in the
+time it takes to swap a few signatures, with no batch transaction and no on-chain
+confirmation standing in the way. What the receiver ends up holding is a
+preconfirmed VTXO, and most of this part has been about what that word is quietly
+carrying: the receiver has to watch for the sender unrolling the branch out from
+under them, the sender and the operator could always have been working together,
+and the chain of transactions sitting behind the coin only ever gets longer.
+
+Checkpoints deal with the griefing problem by making the client pay to ratchet its
+own chain forward instead of the operator. They do not make the chain any shorter.
+The fix for that is the same one as everywhere else in this series: batch swap,
+trade the preconfirmed VTXO for a confirmed one, and throw the chain away.
+
+That is the end of the series. Between the three parts you should now have the
+whole picture: how a VTXO is built and how a tree of them shares one on-chain
+output, how you get out again, and how you can spend in between.
 
 [litepaper]: https://docs.arklabs.xyz/ark.pdf
 [arkade]: https://github.com/lightninglabs/ark

@@ -1,7 +1,7 @@
 ---
 title: "The Ark Protocol: Forfeit Transactions and Connector Trees"
 summary: "How leaving and refreshing a VTXO are made atomic and trustless"
-date: 2026-08-18
+date: 2026-08-21
 ShowToc: true
 cover:
     image: "/ark/cover.png"
@@ -197,9 +197,15 @@ four times dust. A connector tree therefore costs the operator a small, fixed
 amount per forfeit.
 
 That money is not gone, though. The connector output pays straight to the
-operator's own key, so it can sweep the whole thing back whenever it likes, and
-it will do exactly that once the amount sitting there has grown enough to be
-worth the transaction fee to collect.
+operator's own key, so the operator can spend it back to itself and recover the
+dust. It cannot do that immediately, though. Spending the connector output
+destroys the whole tree hanging below it, and with it every connector leaf, which
+would leave the operator holding forfeit transactions it can no longer broadcast.
+So it has to wait until none of those forfeits could still be needed, which means
+waiting until the batches the forfeited VTXOs came from have expired and been
+swept. After that the connector tree is dead weight and the operator can collect
+it, usually once enough of these outputs have accumulated to be worth the
+transaction fee.
 
 Notice too that the connector tree does not have to use the same radix as the
 VTXT. The two trees are built for different reasons and sized by different things,
@@ -239,6 +245,18 @@ transaction still spends that VTXO together with a connector leaf from the new
 batch transaction, and the same atomicity holds: if the batch transaction
 confirms then your coins are on-chain and the operator can claim the old VTXO,
 and if it never confirms then your old VTXO is still yours.
+
+## Wrapping up
+
+Forfeits and connectors are the machinery behind every move out of a batch,
+whether you are leaving the Ark entirely or just refreshing a VTXO that is running
+out of time. The forfeit transaction is the operator's insurance, and the
+connector is what stops that insurance from being worth anything until the new
+batch transaction is actually on-chain. One dependency, and the swap becomes safe
+in both directions at once.
+
+Everything in this part has been about moving between batches. The next part is
+about what you can do without waiting for a batch transaction at all.
 
 [litepaper]: https://docs.arklabs.xyz/ark.pdf
 [arkade]: https://github.com/lightninglabs/ark
