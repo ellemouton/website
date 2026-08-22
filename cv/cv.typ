@@ -257,7 +257,7 @@
       #v(6pt)
       #line(length: 72pt, stroke: 1pt + accent)
     ]
-    #v(16pt)
+    #v(11pt)
 
     #main-h[About]
     I am a backend engineer with 5+ years building production-scale
@@ -269,7 +269,7 @@
     I'm especially interested in agentic loops, building experiences,
     flows, and tools for both developers and non-developers, AI, and
     event-driven systems.
-    #v(16pt)
+    #v(11pt)
 
     #main-h[Experience]
     #job(
@@ -286,6 +286,12 @@
         #link("https://github.com/lightninglabs/lightning-node-connect/graphs/contributors")[#text(fill: accent)[#underline[Lightning Node Connect]]]
         and
         #link("https://github.com/lightninglabs/lightning-terminal")[#text(fill: accent)[#underline[Lightning Terminal]]].
+      ]
+      #bullet[
+        Core contributor to
+        #link("https://github.com/lightninglabs/wavelength/graphs/contributors")[#text(fill: accent)[#underline[Wavelength]]],
+        a self-custodial bitcoin payments toolkit unifying Ark, Lightning
+        swaps and on-chain wallets for apps and agents.
       ]
       #bullet[
         Shipped protocol upgrades and large database migrations safely
@@ -318,13 +324,13 @@
       for millions of users.
     ]
 
-    #v(6pt)
+    #v(2pt)
     #main-h[Writing]
     Deep-dive technical posts on Bitcoin and Lightning Network
     internals, widely read across the community.
     #link("https://www.ellemouton.com/articles/")[ #text(fill: accent, weight: "bold")[#underline[ellemouton.com/articles] →]]
 
-    #v(20pt)
+    #v(12pt)
     #main-h[Public Appearances]
     #grid(
       columns: (1fr, 1fr, 1fr),

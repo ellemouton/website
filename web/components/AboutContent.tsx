@@ -232,10 +232,34 @@ export function AboutContent() {
           >
             Lightning Node Connect
           </a>{" "}
-          developer tooling.
+          developer tooling, and was a core contributor to{" "}
+          <a
+            href="https://github.com/lightninglabs/wavelength/graphs/contributors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Wavelength
+          </a>
+          , a self-custodial bitcoin payments toolkit for applications and
+          agents.
         </p>
         <p>Selected highlights:</p>
         <ul>
+          <li>
+            <strong>
+              <a
+                href="https://github.com/lightninglabs/wavelength"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Wavelength
+              </a>
+            </strong>{" "}
+            &mdash; core contributor to the Go daemon that unifies an Ark
+            client, a Lightning swap engine and an on-chain wallet behind
+            one self-custodial API, with crash-safe durable state across
+            all three.
+          </li>
           <li>
             <strong>LND graph SQL migration</strong> &mdash; led the
             multi-PR{" "}
