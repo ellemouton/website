@@ -46,12 +46,6 @@ participating in a round.
   Swap which involves giving up (forfeiting) ownership of their older VTXO in
   exchange for a new one in a new Batch.
 
-  ![](/ark/vtxo-set-across-batches.png#center)
-
-  There is really just one VTXO set, spread across whichever batches happen to be
-  alive at the time. Each batch runs to its own expiry, so `batch_0` here has
-  already expired and been swept while `batch_1` and `batch_2` are still going.
-
   ![](/ark/refreshing-a-vtxo.png#center)
 
 As you can see, both of these actions involve forfeiting a VTXO in exchange for

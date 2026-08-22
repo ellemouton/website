@@ -140,6 +140,24 @@ everyone could see it coming, but gone all the same. So holding a VTXO comes wit
 standing obligation to do something about it before <code>T<sub>e</sub></code>
 arrives.
 
+That is also worth stepping back from, because a single tree is not the whole
+picture. There is really just one VTXO set, spread across whichever batches happen
+to be alive at the time. Each batch runs to its own expiry, so `batch_0` here has
+already expired and been swept while `batch_1` and `batch_2` are still going.
+
+A VTXO does not necessarily answer to only one of them either. Its lineage can run
+back through several batches, each with its own expiry, and unrolling it means
+getting all of those transactions confirmed. So every batch in that lineage has to
+still be alive for the VTXO to be worth anything, which means it is finished the
+moment the earliest of them expires, not when its own batch does.
+
+![](/ark/vtxo-set-across-batches.png#center)
+
+*This diagram runs slightly ahead of us. The `ft` box is a forfeit transaction, and
+how a VTXO moves from one batch to the next is the subject of the next two parts.
+For now the only thing to take from it is that batches expire independently, and
+that an Ark is always a set of them.*
+
 ## The signing order
 
 Before we get into how a batch transaction actually gets built, it is worth
@@ -160,14 +178,14 @@ interaction between a user and the operator runs through the same four steps.
 Two things fall out of that ordering, and between them they are what make these
 flows trustless.
 
-The first is that the user never gives anything up before they can see exactly what
-they get back. By the time they are asked to sign in step 3, the finished thing is
-sitting in front of them.
+1. The user never gives anything up before they can see exactly what they get
+   back. By the time they are asked to sign in step 3, the finished thing is
+   sitting in front of them.
 
-The second is that the signature they hand over is bound to that one transaction.
-If the operator never broadcasts it, or goes off and builds something different,
-the signature is worth nothing to anybody, and the user still holds whatever they
-started with.
+2. The signature they hand over is bound to that one transaction. If the operator
+   never broadcasts it, or goes off and builds something different, the signature
+   is worth nothing to anybody, and the user still holds whatever they started
+   with.
 
 So neither side has to trust the other. The user cannot be made to pay for
 something they have not seen, and the operator cannot be left holding a promise it
