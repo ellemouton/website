@@ -12,6 +12,8 @@ cover:
 
 Howzit y’all! It’s been a while.
 
+Before we get into it: this is my last Bitcoin related post for the time being. I’m stepping away from the space. I wanted to get it all written down before I go. Ok, let’s dive in!
+
 You have probably heard about the Ark protocol by now but you may have many questions about how it works. My aim here is to explain the protocol step by step (did someone say diagrams?) so that any questions you may have are answered. I’ll run through various examples to help nail down understanding as well. I’ll break this up into a few articles:
 
 <div style="border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;background:var(--entry);">
