@@ -78,7 +78,7 @@ Ok great, we have our first set of VTXT leaf transactions representing our four 
 ![](/ark/vtxt-branch-layer.png#center)
 
 A few things to note about the diagram above:
-- I’ve chosen a radix of 2 here meaning that each branch transaction branches out to two new outputs. But we could have chosen a radix of four too. There are tradeoffs which we can get into later on. For the purpose of this example, we will stick with two.
+- I’ve chosen a radix of 2 here meaning that each branch transaction branches out to two new outputs. But we could have chosen a radix of four too. The tradeoff is depth against size: a higher radix gives a shallower tree, so fewer transactions to broadcast if you ever unroll, but each of those transactions is bigger in bytes. For the purpose of this example, we will stick with two.
 - If you look closely at the scripts of the branch transaction outputs, they differ to the VTXO outputs in two ways:
     - Here we have switched to MuSig2 for the collaborative path.
     - The timeout path here is spendable by the _Operator_ and so these outputs are “owned” by the Operator. This is an important difference. If one of these transactions ends up on-chain but the leaves spending them do not, then it does not mean anything for the Ark participants and their VTXO balances within the Ark. It just means that after the given timeout, the Operator will be able to sweep the funds. Note: participants in this tree would _refresh_ their VTXOs before the operator sweeps the funds - but we will get to that later on.
@@ -103,7 +103,7 @@ Right, so what ends up onchain is a Batch Transaction with a Batch Output like t
 
 ## Unilateral Exit / Unrolling
 
-The important thing to grasp here is that the full tree can go on-chain if needed. During the setup of the tree (which we can cover later), participants and the operator provide all the signatures required such that any participant ends up with the full chain of fully signed transactions from the batch transaction all the way down to the transaction with their VTXO. This means that at any time, if the user wanted to, they can exit the Ark by broadcasting this chain of transactions. They would just need to take responsibility for paying the fees to get the transactions confirmed. Let’s walk through an example to see how a participant would go about doing this and how it would affect the rest of the participants along with the operator.
+The important thing to grasp here is that the full tree can go on-chain if needed. During the setup of the tree, which we will walk through <a href="#building-the-batch-transaction">further down</a>, participants and the operator provide all the signatures required such that any participant ends up with the full chain of fully signed transactions from the batch transaction all the way down to the transaction with their VTXO. This means that at any time, if the user wanted to, they can exit the Ark by broadcasting this chain of transactions. They would just need to take responsibility for paying the fees to get the transactions confirmed. Let’s walk through an example to see how a participant would go about doing this and how it would affect the rest of the participants along with the operator.
 
 Let’s walk through this. Here is a recap of what the full tree looks like:
 
@@ -133,43 +133,20 @@ In the case where some of the transactions from the VTXT make it on chain due to
 
 ![](/ark/vtxt-sweep-after-exit.png#center)
 
-At this point you may still have many questions like:
-- What happens with my VTXO at expiry time? Does the Operator just get all my funds at this point?
-- Great, I have a VTXO - but what can I do with it?
+Either way the outcome for the participants is the same: once the operator has swept,
+that batch is finished. Any VTXO still sitting in the tree at that point is gone. Not
+taken, since the expiry was written into the scripts from the very beginning and
+everyone could see it coming, but gone all the same. So holding a VTXO comes with a
+standing obligation to do something about it before <code>T<sub>e</sub></code>
+arrives.
 
-## Building the Batch Transaction
+## The signing order
 
-We’ve now seen what the VTXT structure looks like. But what we haven’t answered is how we actually get to this state. How do multiple users who do not trust each other and do not trust the operator come together to reach the state in which they can all partake in the Ark by forming the VTXT such we end up with the desired batch transaction on-chain along with all participants holding the proof they need that they own a VTXO within that batch output and are able to claim their funds at any time? In this chapter, we will focus on answering this question.
-
-We’ll walk through an example that builds up to a tree that looks like the example we’ve been using. We start with Alice, Bob, Dave and Carol who will use public keys. <code>P<sub>1</sub></code>, <code>P<sub>2</sub></code>, <code>P<sub>3</sub></code> and <code>P<sub>4</sub></code> respectively. The end goal of each participant is to end up with a VTXO of value <code>v<sub>1</sub></code>, <code>v<sub>2</sub></code>, <code>v<sub>3</sub></code> and <code>v<sub>4</sub></code> respectively. For this example, we will assume that no party has joined the Ark yet and so all participants only have on-chain UTXOs.
-
-<div style="border:2px dashed #b0b0b0;border-radius:8px;padding:1.25rem;margin:1.5rem 0;text-align:center;color:#8a8a8a;font-size:0.9rem;line-height:1.5;"><strong style="letter-spacing:0.08em;">DIAGRAM 13</strong><br>the four participants Alice, Bob, Dave and Carol with their boarding UTXOs</div>
-
-**Step 1: create a boarding output**
-
-Each participant will first create an on-chain boarding output. This output looks very similar to the output of a VTXO in that it is “owned” by the user in that it can be spent by the user unilaterally after a timeout but has a collaborative spend path with the operator that can be spent at any time if the operator and user collaborate. Each of our participants will fund such an output and get it confirmed on chain. Once it has been sufficiently confirmed, they will send a “Join Request” to the operator which will include details of where to find this boarding output along with the desired VTXO details that the user would like to exchange the boarding output for. The main information included here is the public key that the user would like to use for their VTXO along with the value they want to assign. Users could also swap one boarding UTXO in exchange for multiple VTXOs as long as the total value of the requested input (boarding UTXO) is more than the requested VTXO value sum. Each participant would have fetched the operator’s terms (their public key along with the CSV timeouts it expects) sometime before this registration phase.
-
-**Step 2: Sealing the Round**
-
-The process of forming the batch transaction which will describe the VTXT is called a “round”. During the registration phase above, the round is still being formed but at some point, the operator will decide to “seal” the round which means to cut off any new participants from entering the given round. At this point, the operator can build the entire batch transaction structure. The first thing it will do is to build the VTXT template. It does so by taking all the VTXO requests it collected from the participants and using those to build the tree (ie, compute all the virtual transactions within the tree).
-
-The server at this point knows the batch output and so can build the rest of the batch transaction. It will use boarding transactions from the users as inputs. It may also add inputs of its own to further fund the transaction along with change outputs. We will later get to the other parts of this transaction.
-
-Here is the full template, with room for everything a batch transaction might
-carry:
-
-![](/ark/vtxt-batch-tx-template.png#center)
-
-We have only used a few of those boxes so far. The leave outputs and connector
-outputs are what get used when people start leaving the Ark or refreshing their
-VTXOs, which is the subject of the next article.
-
-Note that at this point in time, the full structure of the batch transaction and the VTXT is known but nothing has been signed yet. The users will not be willing to sign the collaborative path of their boarding UTXOs until they are sure that they will get the requested VTXOs in return. So at this point in time, the operator sends each user the unsigned transactions relevant to them. If we focus on Alice, Alice will be sent: the unsigned Batch transaction (which will include Alice’s boarding UTXO as one of the inputs) along with all the transactions in the VTXT that lead from the root output of the tree to Alice’s VTXO. Alice will verify the path to her VTXO before continuing.
-
-### The signing order
-
-What happens next follows a pattern that shows up in almost every interaction
-between a user and the operator, so it is worth pulling out explicitly.
+Before we get into how a batch transaction actually gets built, it is worth
+pulling out a pattern, because you are about to see it twice. It shows up in the
+round we are going to walk through in a moment, and it shows up again when we get
+to Out-of-Round transactions in the last article of the series. Almost every
+interaction between a user and the operator runs through the same four steps.
 
 1. The user prepares their input and leaves it **unsigned**.
 2. They hand it over. The operator builds the final form of whatever is being made,
@@ -196,6 +173,109 @@ So neither side has to trust the other. The user cannot be made to pay for
 something they have not seen, and the operator cannot be left holding a promise it
 has no way to enforce.
 
-operator starts a registration phase. Its public key, <code>P<sub>o</sub></code>, is advertised up front and all wanna-be participants know it along with other operator terms like the batch expiry that it will use and any min/max VTXO amounts that it allows, as well as the radix that it will use for its VTXT construction.
+Keep that shape in mind, because the round we are about to walk through is just
+this pattern with more participants.
+
+## Building the Batch Transaction
+
+We’ve now seen what the VTXT structure looks like. But what we haven’t answered is how we actually get to this state. How do multiple users who do not trust each other and do not trust the operator come together to reach the state in which they can all partake in the Ark by forming the VTXT such we end up with the desired batch transaction on-chain along with all participants holding the proof they need that they own a VTXO within that batch output and are able to claim their funds at any time? In this chapter, we will focus on answering this question.
+
+We’ll walk through an example that builds up to a tree that looks like the example we’ve been using. We start with Alice, Bob, Dave and Carol who will use public keys. <code>P<sub>1</sub></code>, <code>P<sub>2</sub></code>, <code>P<sub>3</sub></code> and <code>P<sub>4</sub></code> respectively. The end goal of each participant is to end up with a VTXO of value <code>v<sub>1</sub></code>, <code>v<sub>2</sub></code>, <code>v<sub>3</sub></code> and <code>v<sub>4</sub></code> respectively. For this example, we will assume that no party has joined the Ark yet and so all participants only have on-chain UTXOs.
+
+**Step 1: The operator advertises its terms**
+
+The operator starts a registration phase. Its public key, <code>P<sub>o</sub></code>, is advertised up front and all wanna-be participants know it along with other operator terms like the batch expiry that it will use and any min/max VTXO amounts that it allows, as well as the radix that it will use for its VTXT construction.
 
 There are multiple actions a client can take in a batch transaction but for now we will focus just on the boarding of the ark: clients all have onchain UTXOs that they would like to exchange for in-Ark VTXOs.
+
+**Step 2: Each participant creates a boarding output**
+
+Each participant will first create an on-chain boarding output. This output looks very similar to the output of a VTXO in that it is “owned” by the user in that it can be spent by the user unilaterally after a timeout but has a collaborative spend path with the operator that can be spent at any time if the operator and user collaborate. Each of our participants will fund such an output and get it confirmed on chain. Once it has been sufficiently confirmed, they will send a “Join Request” to the operator which will include details of where to find this boarding output along with the desired VTXO details that the user would like to exchange the boarding output for. The main information included here is the public key that the user would like to use for their VTXO along with the value they want to assign. Users could also swap one boarding UTXO in exchange for multiple VTXOs as long as the total value of the requested input (boarding UTXO) is more than the requested VTXO value sum. Each participant would have fetched the operator’s terms (their public key along with the CSV timeouts it expects) sometime before this registration phase.
+
+![](/ark/vtxt-boarding-txs.png#center)
+
+The Join Request is where the participant says what they want back. In this example
+each of them asks for a single VTXO, but there is nothing stopping a participant
+from requesting several, as long as the value of the boarding output covers the
+total.
+
+**Step 3: Sealing the round**
+
+The process of forming the batch transaction which will describe the VTXT is called a “round”. During the registration phase above, the round is still being formed but at some point, the operator will decide to “seal” the round which means to cut off any new participants from entering the given round. At this point, the operator can build the entire batch transaction structure. The first thing it will do is to build the VTXT template. It does so by taking all the VTXO requests it collected from the participants and using those to build the tree (ie, compute all the virtual transactions within the tree).
+
+The server at this point knows the batch output and so can build the rest of the batch transaction. It will use boarding transactions from the users as inputs. It may also add inputs of its own to further fund the transaction along with change outputs.
+
+Here is the full template, with room for everything a batch transaction might
+carry:
+
+![](/ark/vtxt-batch-tx-template.png#center)
+
+We have only used a few of those boxes so far. The leave outputs and connector
+outputs are what get used when people start leaving the Ark or refreshing their
+VTXOs, which is the subject of the <a href="../../posts/ark-forfeits-and-connectors" target="_blank" rel="noopener noreferrer">next article</a>.
+
+Note that at this point in time, the full structure of the batch transaction and the VTXT is known but nothing has been signed yet. The users will not be willing to sign the collaborative path of their boarding UTXOs until they are sure that they will get the requested VTXOs in return. So at this point in time, the operator sends each user the unsigned transactions relevant to them. If we focus on Alice, Alice will be sent: the unsigned Batch transaction (which will include Alice’s boarding UTXO as one of the inputs) along with all the transactions in the VTXT that lead from the root output of the tree to Alice’s VTXO. Alice will verify the path to her VTXO before continuing.
+
+![](/ark/vtxt-sign-1.png#center)
+
+**Step 4: Signing the tree**
+
+With the template agreed, the participants and the operator work through the signing
+sessions for the tree itself. These use MuSig2, which is why the branch and root
+outputs switched to a MuSig2 collaborative path earlier, and if you want a refresher
+on how that works my <a href="../../posts/taproot-prelims" target="_blank" rel="noopener noreferrer">earlier article</a>
+covers it.
+
+A participant only takes part in the sessions for the transactions on the path from
+the batch output down to their own VTXO. Alice signs for <code>vtx<sub>7</sub></code>,
+<code>vtx<sub>5</sub></code> and <code>vtx<sub>1</sub></code> and never touches the
+branch that Dave and Carol care about. Once every session has completed, every
+transaction in the tree carries a valid signature.
+
+This is the moment that matters for Alice. Holding a fully signed path from the
+batch output down to her VTXO is exactly what lets her unroll on her own later, so
+until she has it she has no reason to give anything up.
+
+![](/ark/vtxt-sign-2.png#center)
+
+Two simplifications in these diagrams. Each input is drawn with a separate chip per
+signer so you can see who is involved, but in reality those are aggregated into a
+single MuSig2 signature rather than one signature each. And MuSig2 needs a round of
+nonce exchange before any of that can happen, which I am leaving out here: take it
+as implied by the signing step.
+
+**Step 5: Signing the inputs and broadcasting**
+
+Now that she has it, she is happy to sign the input of the batch transaction that
+spends her boarding output. She is only signing for her own input, and only for
+this particular batch transaction.
+
+The operator collects the input signatures from every participant, adds its own
+signatures for the inputs it contributed, and broadcasts. When the batch transaction
+confirms, all four participants hold a VTXO inside it, and the tree we spent the
+first half of this article building is finally backed by a real on-chain UTXO.
+
+![](/ark/vtxt-sign-3.png#center)
+
+## Wrapping up
+
+We started with a single VTXO and its two spend paths, grew it into a tree of
+pre-signed transactions, hung that tree off one on-chain batch transaction, and then
+walked through the round that actually produces it.
+
+Which answers the trust question from earlier. The operator cannot take your funds:
+every VTXO has a unilateral exit path, and by the end of the round you are holding a
+fully signed chain of transactions that gets you on-chain without asking anybody.
+What the operator can do is stop cooperating, and either way the batch output
+expires. So the tradeoff is not custody, it is that you cannot go to sleep forever.
+
+Which leaves two questions hanging:
+
+- What happens with my VTXO at expiry time? Does the Operator just get all my funds
+  at this point?
+- Great, I have a VTXO, but what can I do with it?
+
+Both are for the articles that follow.
+
+As always, if you have any questions, comments or corrections, please feel free to
+leave a comment down below :)
