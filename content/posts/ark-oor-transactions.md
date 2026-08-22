@@ -203,6 +203,9 @@ in the griefing attack.
 We'll just use the situation where a VTXO A owner, Alice, wants to spend her VTXO
 and create VTXO B for Bob. The following steps are required:
 
+If this feels familiar, it should. It is the same <a href="../../posts/ark-vtxos-and-trees#the-signing-order" target="_blank" rel="noopener noreferrer">signing order</a> we saw when building a batch transaction: prepare the input unsigned, let the other side build the finished thing around it, check it, and only
+then sign.
+
 **Step 1**
 
 Alice will create two transactions and sends them to the operator.
