@@ -180,24 +180,59 @@ a {
     max-width: calc(900px + var(--gap) * 2);
 }
 
-/* Posts that carry a ToC rail widen by the rail (200px) plus the grid gap
- * (2.5rem), so the prose column itself stays at the 720px reading width
- * rather than being squeezed to make room for the sidebar. */
-.main:has(.post-with-toc) {
-    max-width: calc(960px + var(--gap) * 2);
-}
-
-/* Sticky ToC rail on post pages. Capped to the viewport so a long
- * contents list scrolls within the rail instead of running off-screen;
- * scrollbar-width: none keeps that from showing a permanent gutter. */
+/* Post ToC rail.
+ *
+ * The rail is lifted out of the flow into the left margin rather than
+ * given a column, so the prose keeps the full --main-width measure and
+ * stays centred exactly as it does on a post without a ToC. Nothing
+ * about the reading column changes when a ToC appears.
+ *
+ * That needs a clear gutter of (rail + offset) on each side of the
+ * centred column, since the column is centred and the margins are equal:
+ *   720 + 24*2  (the post column)      = 768
+ *   200 + 32    (rail plus its offset) = 232  on each side
+ *   768 + 232*2                        = 1232
+ * Below that the rail would crowd the viewport edge, so it hides and the
+ * inline collapsible block takes over. Rounded up to 1280 for margin. */
 .post-toc-aside {
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
-    scrollbar-width: none;
+    display: none;
 }
 
-.post-toc-aside::-webkit-scrollbar {
-    display: none;
+@media (min-width: 1280px) {
+    .post-with-toc {
+        position: relative;
+    }
+
+    /* Spans the article's height so the sticky rail inside has a range to
+     * travel, then comes to rest at the end of the post. */
+    .post-toc-aside {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: calc(100% + 2rem);
+        width: 200px;
+        height: 100%;
+    }
+
+    /* The rail itself is the sticky, scrolling element — it is also what
+     * the component holds a ref to for keeping the active entry in view,
+     * so the scroll container and the ref'd node must be the same node.
+     * scrollbar-width: none avoids a permanent gutter on long contents. */
+    .post-toc-rail {
+        position: sticky;
+        top: 2rem;
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+
+    .post-toc-rail::-webkit-scrollbar {
+        display: none;
+    }
+
+    .post-toc-inline {
+        display: none;
+    }
 }
 
 /* Current section: brighter text and the dash held at its hover length,

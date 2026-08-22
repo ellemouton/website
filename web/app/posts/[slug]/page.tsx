@@ -98,28 +98,27 @@ export default async function PostPage({
         </div>
       </header>
 
-      <div className={hasToc ? "grid gap-10 md:grid-cols-[200px_1fr]" : undefined}>
-        {hasToc && (
-          <aside className="post-toc-aside hidden md:block md:sticky md:top-8 md:self-start">
+      {/* The rail is pulled out into the left margin (see globals.css)
+       * rather than taking a grid column, so the prose column keeps its
+       * full --main-width measure and stays centred. Below the width
+       * where a margin rail fits, the inline block takes over. */}
+      {hasToc && (
+        <>
+          <aside className="post-toc-aside">
             <PostTocSidebar nodes={toc} />
           </aside>
-        )}
+          <div className="post-toc-inline">
+            <PostToc nodes={toc} />
+          </div>
+        </>
+      )}
 
-        <div className="min-w-0">
-          {hasToc && (
-            <div className="md:hidden">
-              <PostToc nodes={toc} />
-            </div>
-          )}
+      <div
+        className="post-content"
+        dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+      />
 
-          <div
-            className="post-content"
-            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-          />
-
-          <Utterances />
-        </div>
-      </div>
+      <Utterances />
     </article>
   );
 }
