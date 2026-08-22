@@ -180,6 +180,50 @@ a {
     max-width: calc(900px + var(--gap) * 2);
 }
 
+/* Posts that carry a ToC rail widen by the rail (200px) plus the grid gap
+ * (2.5rem), so the prose column itself stays at the 720px reading width
+ * rather than being squeezed to make room for the sidebar. */
+.main:has(.post-with-toc) {
+    max-width: calc(960px + var(--gap) * 2);
+}
+
+/* Sticky ToC rail on post pages. Capped to the viewport so a long
+ * contents list scrolls within the rail instead of running off-screen;
+ * scrollbar-width: none keeps that from showing a permanent gutter. */
+.post-toc-aside {
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.post-toc-aside::-webkit-scrollbar {
+    display: none;
+}
+
+/* Current section: brighter text and the dash held at its hover length,
+ * keyed off the same aria-current the screen reader sees. */
+.post-toc-rail .toc-link[aria-current="location"] {
+    color: var(--primary);
+}
+
+.post-toc-rail .toc-link[aria-current="location"] .toc-dash {
+    width: 28px;
+    background: var(--primary);
+}
+
+/* Anchor targets clear the top edge when jumped to from the ToC. */
+.post-content :is(h2, h3) {
+    scroll-margin-top: 2rem;
+}
+
+/* Smooth anchor jumps, but only for readers who haven't asked for less
+ * motion. */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
 /* Post-page Table of Contents — modelled on PaperMod's .toc block.
  * Lives inside .post-content (between header and body) so it inherits
  * the post column width without extra layout work. Muted card look

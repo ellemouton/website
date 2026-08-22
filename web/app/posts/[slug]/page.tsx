@@ -4,6 +4,8 @@ import { getPost, listPostSlugs } from "@/lib/posts";
 import { siteConfig } from "@/lib/site-config";
 import { Utterances } from "@/components/Utterances";
 import { PostToc } from "@/components/PostToc";
+import { PostTocSidebar } from "@/components/PostTocSidebar";
+import { extractHeadings, nest } from "@/lib/toc";
 
 export async function generateStaticParams() {
   const slugs = await listPostSlugs();
@@ -68,8 +70,14 @@ export default async function PostPage({
     notFound();
   }
 
+  // Headings are scraped once here and handed to both ToC renderers, so
+  // the inline block and the sticky rail can never disagree. A post with
+  // no headings gets neither, and keeps the plain reading column.
+  const toc = nest(extractHeadings(post.contentHtml));
+  const hasToc = toc.length > 0;
+
   return (
-    <article className="post-single">
+    <article className={hasToc ? "post-single post-with-toc" : "post-single"}>
       <header className="post-header mb-6">
         <h1 className="post-title text-4xl font-extrabold">
           {post.frontmatter.title}
@@ -90,14 +98,28 @@ export default async function PostPage({
         </div>
       </header>
 
-      <PostToc html={post.contentHtml} />
+      <div className={hasToc ? "grid gap-10 md:grid-cols-[200px_1fr]" : undefined}>
+        {hasToc && (
+          <aside className="post-toc-aside hidden md:block md:sticky md:top-8 md:self-start">
+            <PostTocSidebar nodes={toc} />
+          </aside>
+        )}
 
-      <div
-        className="post-content"
-        dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-      />
+        <div className="min-w-0">
+          {hasToc && (
+            <div className="md:hidden">
+              <PostToc nodes={toc} />
+            </div>
+          )}
 
-      <Utterances />
+          <div
+            className="post-content"
+            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+          />
+
+          <Utterances />
+        </div>
+      </div>
     </article>
   );
 }
