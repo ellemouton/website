@@ -212,7 +212,7 @@ a {
 }
 
 /* Anchor targets clear the top edge when jumped to from the ToC. */
-.post-content :is(h2, h3) {
+.post-content :is(h1, h2, h3, h4) {
     scroll-margin-top: 2rem;
 }
 
