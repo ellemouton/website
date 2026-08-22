@@ -4,7 +4,7 @@
 export const siteConfig = {
   title: "Elle Mouton",
   description:
-    "Backend engineer in San Francisco. 5+ years building distributed systems, from event-driven microservices to protocol-level work on live peer-to-peer networks.",
+    "Backend engineer in San Francisco. 5+ years building distributed systems, most of it protocol and infrastructure work on Bitcoin's Lightning Network.",
   author: "Elle Mouton",
 
   // Header menu items, ordered. Mirrors config.yml's `menu.main` minus

@@ -146,22 +146,22 @@ export function AboutContent() {
         <h2 id="about">About</h2>
         <p>
           Backend engineer with 5+ years building production-scale
-          distributed systems. My work spans event-driven microservices
-          serving millions of users and protocol-level upgrades to large,
-          live peer-to-peer networks. I thrive in small, fast-moving teams
-          with high ownership and high engineering standards.
+          distributed systems. Most of that has been on Bitcoin&rsquo;s
+          Lightning Network &mdash; shipping protocol upgrades and large
+          database migrations across a live peer-to-peer network of
+          thousands of independently run nodes, where a change has to
+          stay compatible with software you don&rsquo;t control and
+          can&rsquo;t roll back.
         </p>
 
         <p>
-          I&rsquo;m especially interested in agentic loops, building
-          experiences, flows, and tools for both developers and
-          non-developers, AI, and event-driven systems.
+          Before Lightning, I built event-driven microservices handling
+          high cryptocurrency volumes for millions of users.
         </p>
 
         <p>
-          Day-to-day I work with local parallel coding agents
-          (Codex, Claude) &mdash; designing features and steering
-          agents through implementation.
+          I&rsquo;m especially interested in agentic loops, AI tooling,
+          and event-driven systems.
         </p>
 
         <p>
