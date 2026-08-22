@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { siteConfig } from "@/lib/site-config";
 
 export function Footer() {
@@ -12,9 +14,9 @@ export function Footer() {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <span>
           © {new Date().getFullYear()}{" "}
-          <a href="/" className="hover:text-[color:var(--primary)]">
+          <Link href="/" className="hover:text-[color:var(--primary)]">
             {siteConfig.author}
-          </a>
+          </Link>
         </span>
         <span aria-hidden>·</span>
         <a
