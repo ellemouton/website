@@ -225,12 +225,6 @@
       Distributed systems · P2P networks · event-driven systems &
       pipelines · protocol design · database migrations · code review
       at scale
-      #v(16pt)
-
-      #skill-label[Agentic Workflows]
-      #v(8pt)
-      Daily use of local parallel coding agents (Codex, Claude) ·
-      designing features and steering agents through implementation
     ]
 
     #v(26pt)
@@ -257,19 +251,20 @@
       #v(6pt)
       #line(length: 72pt, stroke: 1pt + accent)
     ]
-    #v(11pt)
+    #v(14pt)
 
     #main-h[About]
-    I am a backend engineer with 5+ years building production-scale
-    distributed systems. My work spans event-driven microservices
-    serving millions of users and protocol-level upgrades to large,
-    live peer-to-peer networks. I thrive in small, fast-moving teams
-    with high ownership and high engineering standards.
+    Backend engineer with 5+ years building distributed systems, most
+    of it on Bitcoin's Lightning Network at
+    #link("https://lightning.engineering")[#text(fill: accent)[#underline[Lightning Labs]]]:
+    protocol upgrades and large database migrations shipped across a
+    live network of thousands of independently run nodes. Before that,
+    event-driven microservices at
+    #link("https://www.luno.com")[#text(fill: accent)[#underline[Luno]]],
+    handling crypto volumes for millions of users.
     #v(7pt)
-    I'm especially interested in agentic loops, building experiences,
-    flows, and tools for both developers and non-developers, AI, and
-    event-driven systems.
-    #v(11pt)
+    Interested in agentic loops, AI tooling, and event-driven systems.
+    #v(14pt)
 
     #main-h[Experience]
     #job(
@@ -324,13 +319,13 @@
       for millions of users.
     ]
 
-    #v(2pt)
+    #v(4pt)
     #main-h[Writing]
     Deep-dive technical posts on Bitcoin and Lightning Network
     internals, widely read across the community.
     #link("https://www.ellemouton.com/articles/")[ #text(fill: accent, weight: "bold")[#underline[ellemouton.com/articles] →]]
 
-    #v(12pt)
+    #v(16pt)
     #main-h[Public Appearances]
     #grid(
       columns: (1fr, 1fr, 1fr),

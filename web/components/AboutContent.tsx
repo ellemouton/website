@@ -147,16 +147,30 @@ export function AboutContent() {
         <p>
           Backend engineer with 5+ years building production-scale
           distributed systems. Most of that has been on Bitcoin&rsquo;s
-          Lightning Network &mdash; shipping protocol upgrades and large
-          database migrations across a live peer-to-peer network of
-          thousands of independently run nodes, where a change has to
-          stay compatible with software you don&rsquo;t control and
-          can&rsquo;t roll back.
+          Lightning Network at{" "}
+          <a
+            href="https://lightning.engineering"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Lightning Labs
+          </a>{" "}
+          &mdash; shipping protocol upgrades and large database migrations
+          across a live peer-to-peer network of thousands of independently
+          run nodes, where a change has to stay compatible with software
+          you don&rsquo;t control and can&rsquo;t roll back.
         </p>
 
         <p>
-          Before Lightning, I built event-driven microservices handling
-          high cryptocurrency volumes for millions of users.
+          Before Lightning, I built event-driven microservices at{" "}
+          <a
+            href="https://www.luno.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Luno
+          </a>
+          , handling high cryptocurrency volumes for millions of users.
         </p>
 
         <p>
