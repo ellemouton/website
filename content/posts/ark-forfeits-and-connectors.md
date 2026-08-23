@@ -1,7 +1,7 @@
 ---
 title: "The Ark Protocol: Forfeit Transactions and Connector Trees"
 summary: "How leaving and refreshing a VTXO are made atomic and trustless"
-date: 2026-08-21
+date: 2026-08-22
 ShowToc: true
 cover:
     image: "/ark/cover.png"
