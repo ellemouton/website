@@ -8,6 +8,8 @@ cover:
     image: "/ark/cover-vtxos.png"
 ---
 
+![](/ark/cover-vtxos-banner.png#center)
+
 ## Test test, is this thing on?
 
 Howzit y’all! It’s been a while.
