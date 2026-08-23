@@ -1,7 +1,7 @@
 ---
 title: "The Ark Protocol: VTXOs and the Virtual Transaction Tree"
 summary: "How many users share one on-chain UTXO while keeping custody of their funds"
-date: 2026-08-20
+date: 2026-08-21
 ShowToc: true
 
 cover:

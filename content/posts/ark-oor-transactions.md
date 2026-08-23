@@ -1,7 +1,7 @@
 ---
 title: "The Ark Protocol: OOR Transactions"
 summary: "Paying inside an Ark without waiting for a batch transaction, and what it costs"
-date: 2026-08-22
+date: 2026-08-23
 cover:
   image: "/ark/cover-oor.png"
 ShowToc: true
