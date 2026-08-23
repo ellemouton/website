@@ -7,6 +7,8 @@ cover:
 ShowToc: true
 ---
 
+![](/ark/cover-oor-banner.png#center)
+
 # OOR Transactions
 
 <div style="border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;background:var(--entry);">
